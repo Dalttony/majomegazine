@@ -10,7 +10,7 @@ majo.creator = majo.creator || {};
 		squareli: 10, 
 		square: 0,
 		idcanvas: "canvas",
-		idsgv: "sgvcanvas",
+		idsvg: "sgvcanvas",
 		padding:15, //Padding Canvas
 		maximg:8 //Maximun number into canvas
 	};
@@ -34,7 +34,7 @@ majo.creator = majo.creator || {};
 	var imagenground = [];
 	var textsource = [];
 	var currenttext = null;
-	var currentImgae = null;
+	var currentImage = null;
 	//resizing the img
 	var shar = false;
 	this.getEdition = function(){
@@ -46,14 +46,22 @@ majo.creator = majo.creator || {};
 	//initialize function to get the canvas component
 	this.initialize = function(){
 		canvas = document.getElementById(conf.idcanvas);
-		svgcanvas = document.getElementById(conf.idsgv);
+		svgcanvas = document.getElementById(conf.idsvg);
 		
-		svgcanvas.setAttribute("width", conf.cvw);
- 		svgcanvas.setAttribute("height", conf.cvh);
+		//svgcanvas.setAttribute("width", conf.cvw);
+ 		//svgcanvas.setAttribute("height", conf.cvh);
 
 		canvas.width = conf.cvw;
 		canvas.height = conf.cvh;
 		canvas.addEventListener("wheel",this.currentZoom);
+		canvas.addEventListener("mousemove",this.handler.mousemove);
+		canvas.addEventListener("mousedown",this.handler.mousedown);
+		canvas.addEventListener("mouseup",this.handler.mouseup);
+		canvas.addEventListener("contextmenu",this.handler.contextmenu);
+		canvas.addEventListener("drop",this.handler.drop);
+		canvas.addEventListener("dragover",this.handler.dragover);
+		canvas.addEventListener("dragleave",this.handler.dragleave);
+		console.log(Object.create(canvas));
 		//canvas.addEventListener("drop",dropImage,true);
 		//canvas.addEventListener("dragover",overImage,true);
 		ctx = canvas.getContext("2d");
@@ -165,8 +173,13 @@ majo.creator = majo.creator || {};
 		var x,y;
 
 		this.onMouseMove = function(evt){
-			console.log(evt)
-			if(current){
+			/*self.getPos().x+=1;
+			self.getPos().y+=1;
+			evt.target.style.left = self.getPos().x+"px";
+			evt.target.style.top = self.getPos().y+"px";*/
+		//	console.log(evt);
+			
+			/*if(current){
 				var x1=evt.offsetX;
 				var y1=evt.offsetY;
 				var mx,my;
@@ -191,12 +204,12 @@ majo.creator = majo.creator || {};
 				}*/
 				//evt.target.style.left = self.getPos().x+"px";
 				//evt.target.style.top = self.getPos().y+"px";
-					evt.target.style.left = evt.x+"px";
+					/*evt.target.style.left = evt.x+"px";
 				evt.target.style.top =evt.y+"px";
 				console.log(mx,my);
 				x=x1;
 				y=y1;
-			}
+			}*/
 		};	
 		//move te text in the image 
 		this.onMouseDown = function(evt){
@@ -210,10 +223,11 @@ majo.creator = majo.creator || {};
 			evt.target.style.cursor ="move";
 		};
 		this.onMouseUp = function(evt){
-			current=false;
 			evt.target.style.cursor ="auto";
+			current=false;
+			
 		};
-		this.onMousedbClick = function(evt){
+		this.onClick = function(evt){
 			evt.target.className +=" active";
 			evt.target.setAttribute("contentEditable","true");
 			evt.target.focus();
@@ -325,28 +339,22 @@ majo.creator = majo.creator || {};
 			this.ele.style.maxHeight=this.getSquare().maxh+"px";
 			this.ele.style.maxWidth=this.getSquare().maxw+"px";
 			//this.ele.style.lineHeight="55px"//size letter
-			if(textsource.length==0){
-				
-			}
 			if(textsource.length==1){
 				this.getPos().y= conf.cvh-this.getSquare().minh-20;
-			
 			}
 			if(textsource.length>2){
 				this.getPos().x = Math.floor(Math.random() * (conf.cvw - 100 + 1)) + 100;
 				this.getPos().y = Math.floor(Math.random() * (conf.cvh - 100 + 1)) + 100;
-
-
 			}
 			this.ele.style.top=this.getPos().y+"px";
 			this.ele.style.left=this.getPos().x+"px";
 			this.root.appendChild(this.ele);
 			this.ele.onblur = this.onfocusout;
 			this.ele.onclick = this.onClick;
-			this.ele.onmousemove=this.onMouseMove;
+			this.ele.onmousemove = this.onMouseMove;
 			this.ele.onmouseup=this.onMouseUp;
-			this.ele.onmousedown=this.onMouseDown;
-			this.ele.ondblclick = this.onMousedbClick;
+			this.root.onmousedown=this.onMouseDown;
+			//this.ele.ondblclick = this.onMousedbClick;
 			this.ele.onresize = this.onResize;
 			this.ele.focus();
 		},
@@ -415,7 +423,7 @@ majo.creator = majo.creator || {};
 			return style;
 		};
 
-		Text.call(this,id);
+		Text.call(this, id);
 	}
 
 	TextMeme.prototype = Text.prototype;
@@ -487,7 +495,6 @@ majo.creator = majo.creator || {};
 		this.sx= x;
 		this.sy= this.y;
 		this.sx = this.w;
-		
 		var self = this;
 		var currentSelect=false;
 		//to cut of Image
@@ -564,10 +571,9 @@ majo.creator = majo.creator || {};
 			ctxfinally.drawImage(ctx.canvas,0,0,conf.cvw,conf.cvh);
 		};
 
-		this.drawsgv = function(){
+		this.drawsvg = function(){
 
-			var image = document.createElementNS(NS,"image");
-			console.log(Object.create(image));
+			var image = document.createElementNS(NS,"image");			
 			image.href.baseVal = this.imgtemp;
 			image.x.baseVal.value  = this.x;
 			image.y.baseVal.value  = this.y;
@@ -575,16 +581,36 @@ majo.creator = majo.creator || {};
 			image.height.baseVal.value  = this.h;
 			sgvcanvas.appendChild(image);
 
- 			var svg = document.getElementById(conf.idsgv);
+ 			var svg = document.getElementById(conf.idsvg);
  			svg.setAttribute("xmlns:xlink","http://www.w3.org/1999/xlink");
+ 			console.log(Object.create(svg));
 
-
-			var svgString = new XMLSerializer().serializeToString(document.querySelector('svg'));
-			var svg = $("#"+conf.idsgv).html().replace(/>\s+/g, ">").replace(/\s+</g, "<").replace(" xlink=", " xmlns:xlink=").replace(/\shref=/g, " xlink:href="); //retiramos todos os espaços entre as tags e substituímos " xlink=" por " xmlns:xlink=" e " href=" por " xlink:href=", caso o navegador tenha alterado (Chrome, por exemplo).
-        canvg(canvas, svg);
+			var svgString = new XMLSerializer().serializeToString(document.getElementById(conf.idsvg));
+		
+  			console.log(svgString);
+			//var svg = $("#"+conf.idsvg).html().replace(/>\s+/g, ">").replace(/\s+</g, "<").replace(" xlink=", " xmlns:xlink=").replace(/\shref=/g, " xlink:href="); //retiramos todos os espaços entre as tags e substituímos " xlink=" por " xmlns:xlink=" e " href=" por " xlink:href=", caso o navegador tenha alterado (Chrome, por exemplo).
+       		 canvg(canvas, svg.outerHTML);
 			//var canvas = document.getElementById("canvas");
+			//
+			/*var img = new Image();
+			img.crossOrigin ="Anonymous";
+			var reader = new window.FileReader();
+			var svg = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+			//parse to sgv to base64 encode
+			reader.readAsDataURL(svg); 
+			 reader.onloadend = function() {
+			              var base64data = reader.result;   
+			               img.src = reader.result;
+			                img.onload = function () {
+				
+							 console.log(img);
+						  	ctx.drawImage(img, 20,40);
+						 // window.open(canvas.toDataURL());
+						  //self.root.removeChild(self.ele);
+						}
+			  }*/
 			
-
+			
 		};
 
 		this.setCutState = function(state){
@@ -639,7 +665,7 @@ majo.creator = majo.creator || {};
 			tmpcut.y = cy;
 			//cut.state = true;
 		}
-		this.endCut = function(x,y){
+		this.endCut = function(x, y){
 			var x = (x*conf.cvw) / (this.x+this.w);
 			var y = (y*conf.cvh)/(this.y+this.h);
 			var w = x - tmpcut.x;
@@ -667,11 +693,12 @@ majo.creator = majo.creator || {};
 		this.noCut = function(){
 			canvas.width = canvas.width;
 			ctx.drawImage(ctxcache.canvas,0,0,conf.cvw,conf.cvh);
-			currentImgae = false;
+			currentImage = false;
 			//render();	
 		};
 		//zooming for the current image (in) increase and (out) decrease  
 		this.zoomin = function(){
+			this.zoom = true;
 			if(cut.h>50){
 				cut.x+=2;
 				cut.y+=2;
@@ -688,11 +715,14 @@ majo.creator = majo.creator || {};
 			{
 				if(cut.x>0) cut.x-=2;
 				if(cut.y>0)	cut.y-=2;
-				if(cut.w<conf.cvw)cut.w+=4;
+				if(cut.w<conf.cvw) cut.w+=4;
 				if(cut.h<conf.cvh) cut.h+=4;
 				cut.state=true;
 				render();
 			}
+		};
+		this.stateZomm = function(){
+			return this.zoom;
 		};
 		var mx,my;
 		this.initMove = function(x,y){
@@ -702,9 +732,8 @@ majo.creator = majo.creator || {};
 
 		this.move = function(x,y){
 			var mvx,mvy;
-			mvx=mx - x;
-			mvy=my - y;
-			console.log(mvy,mvx);
+			mvx = mx - x;
+			mvy = my - y;
 			if(mvx>0){
 				if((cut.x+cut.w)<conf.cvw)cut.x+=1;
 			}else{
@@ -793,7 +822,6 @@ majo.creator = majo.creator || {};
 		}
 		textsource.push(text);
 		currenttext = text;
-		
 	};
 	this.getImageLength = function(){
 		return imagenSorce.length;
@@ -830,7 +858,7 @@ majo.creator = majo.creator || {};
 
     		imgtemp.crossOrigin ="Anonymous";
 			
-				var img = new ImagenMeme(imagenSorce.length)
+				/*var img = new ImagenMeme(imagenSorce.length)
 				//img.setSource(src);
 				img.tempimage(data.source);
 				imagenSorce.push(img);
@@ -840,7 +868,7 @@ majo.creator = majo.creator || {};
 					src: data.source,
 					alt: data.alt
 				}];
-				majo.observer.reciveNotify("newImagen", minimg);
+				majo.observer.reciveNotify("newImagen", minimg);*/
     		imgtemp.onload = function(){
                 crx.drawImage(imgtemp, 0, 0, conf.cvw, conf.cvh);
                 var src = cr.toDataURL();
@@ -849,12 +877,12 @@ majo.creator = majo.creator || {};
 					src: data.source,
 					alt: data.alt
 				}];
-				/*var img = new ImagenMeme(imagenSorce.length)
+				var img = new ImagenMeme(imagenSorce.length)
 				img.setSource(src);
 				img.tempimage(imgtemp.src);
 				imagenSorce.push(img);
 				selectGrid();
-				majo.observer.reciveNotify("newImagen", minimg);*/
+				majo.observer.reciveNotify("newImagen", minimg);
 				//self.model.cacheImage(newdata, "newImage");
             }
             imgtemp.src = data.source; 
@@ -979,7 +1007,7 @@ majo.creator = majo.creator || {};
 
 	//-----------------fin section
 	function selectGrid (){
-		currentImgae=false;
+		currentImage=false;
 		switch(imagenSorce.length){
 			case 1: 
 				simpleSquare();
@@ -1032,19 +1060,20 @@ majo.creator = majo.creator || {};
 	//indentify the style for to draw simpleSquare, rendering of objct.
 	var squareDraw;
 	var render = function(){
+		
+
 		/*var len = imagenSorce.length;
 		var i = 0;
-		canvas.width = canvas.width;
 		for (; i < len; i++) {
-			imagenSorce[i].draw();
+			imagenSorce[i].drawsvg();
 		};*/
 
 		var len = imagenSorce.length;
 		var i = 0;
+		canvas.width = canvas.width;
 		for (; i < len; i++) {
-			imagenSorce[i].drawsgv();
-		};
-
+			imagenSorce[i].draw();
+		}
 	}
 
 	var renderCurrent = function(){
@@ -1053,23 +1082,23 @@ majo.creator = majo.creator || {};
 		ctx.strokeStyle="#FF0000";
 		ctx.lineWidth = 4;
 		ctx.lineCap = "round";
-		ctx.rect(currentImgae.x,currentImgae.y,currentImgae.w,currentImgae.h);
+		ctx.rect(currentImage.x,currentImage.y,currentImage.w,currentImage.h);
 		ctx.stroke()
 		
 		
 		
-		var middle =Math.ceil(currentImgae.w/2);
+		var middle =Math.ceil(currentImage.w/2);
 		ctx.lineWidth = 5;
 		//top
-		ctx.rect(currentImgae.x+middle,currentImgae.y,sizsquad,sizsquad);
+		ctx.rect(currentImage.x+middle,currentImage.y,sizsquad,sizsquad);
 		//bottom
-		ctx.rect(currentImgae.x+middle,currentImgae.y+currentImgae.h-sizsquad,sizsquad,sizsquad);
+		ctx.rect(currentImage.x+middle,currentImage.y+currentImage.h-sizsquad,sizsquad,sizsquad);
 		
-		middle=Math.ceil(currentImgae.h/2);
+		middle=Math.ceil(currentImage.h/2);
 		//right
-		ctx.rect(currentImgae.x,currentImgae.y+middle,sizsquad,sizsquad);
+		ctx.rect(currentImage.x,currentImage.y+middle,sizsquad,sizsquad);
 		//left
-		ctx.rect(currentImgae.x+currentImgae.w-sizsquad,currentImgae.y+middle,sizsquad,sizsquad);
+		ctx.rect(currentImage.x+currentImage.w-sizsquad,currentImage.y+middle,sizsquad,sizsquad);
 
 		ctx.stroke()
 
@@ -1084,14 +1113,14 @@ majo.creator = majo.creator || {};
 		canvas.width = canvas.width;
 		ctx.drawImage(ctxcache.canvas,0,0,conf.cvw,conf.cvh);
 		ctx.fillStyle = "rgba(255,255,255,0.5)";
-		ctx.fillRect(currentImgae.getCut().sx,currentImgae.getCut().sy,w,h);
+		ctx.fillRect(currentImage.getCut().sx,currentImage.getCut().sy,w,h);
 		ctx.strokeStyle = "rgb(255,255,255)";
 		ctx.setLineDash([5, 9]);
-		ctx.rect(currentImgae.getCut().sx,currentImgae.getCut().sy,w,h);
+		ctx.rect(currentImage.getCut().sx,currentImage.getCut().sy,w,h);
 		ctx.stroke();
 	}
 	this.initCut = function(x,y){
-		currentImgae.initCut(x,y);
+		currentImage.initCut(x,y);
 	}
 	//__________________________________
 	//style general of object
@@ -1525,21 +1554,21 @@ majo.creator = majo.creator || {};
 			i=0;
 			for (; i < len; i++) {
 				if((x > imagenSorce[i].x && x < (imagenSorce[i].x+imagenSorce[i].w)) && (y > imagenSorce[i].y && y < (imagenSorce[i].y + imagenSorce[i].h))){
-					if(currentImgae === imagenSorce[i]){
+					if(currentImage === imagenSorce[i]){
 						
-						return currentImgae;
+						return currentImage;
 					}
 					else{
-						currentImgae = imagenSorce[i];
+						currentImage = imagenSorce[i];
 						imagenSorce[i].setCurrent();
-						return currentImgae;
+						return currentImage;
 					}
 				}
 			}
 		}
 		else
 		{
-			currentImgae = null;
+			currentImage = null;
 			return null;
 		}
 	};
@@ -1565,27 +1594,27 @@ majo.creator = majo.creator || {};
 		}
 		else
 		{
-			currentImgae = null;
+			currentImage = null;
 			return null;
 		}
 	};
 //**--------------- Finish event interact
 	this.getCurrent = function(){
-		return currentImgae;
+		return currentImage;
 	}
 	//zomm of current image
 	this.currentZoom = function(event){
-		if(currentImgae){
+		if(currentImage){
 			var pos = event;
   			var x = pos.offsetX;
   			var y = pos.offsetY;
-			if((x > currentImgae.x && x < (currentImgae.x+currentImgae.w)) && (y > currentImgae.y && y < (currentImgae.y + currentImgae.h))){
+			if((x > currentImage.x && x < (currentImage.x + currentImage.w)) && (y > currentImage.y && y < (currentImage.y + currentImage.h))){
 				var delta = event.deltaY;
 				if(delta>0){
-					currentImgae.zoomout();
+					currentImage.zoomout();
 				}else{
 					
-					currentImgae.zoomin();
+					currentImage.zoomin();
 				}
 			}else{
 
@@ -1604,200 +1633,188 @@ majo.creator = majo.creator || {};
 	};
 
 
-/*onMouseDown:function(evt){
-  		var pos = evt.nativeEvent;
-  		var target = evt.target;
-  		var x = pos.offsetX;
-  		var y = pos.offsetY;
-  		current = (pos.button==0)?MajoCreator.setCurrentimage(x,y):null;
-  		var btn = (pos.button==1)?0:pos.button;
-  		if(current){
-  			if(btn==0){	
-  				//ask if the state of the image is true, then the image is able for to moving 
-  				if(current.getCut().state){
-  					target.style.cursor="move";
-  					current.initMove(x,y);
-  				}
-  			}
-  			else
-  			{
-  				MajoCreator.setEdition(true);
-  				MajoCreator.initCut(x,y);
-  				target.style.cursor="crosshair";
-  			}
-  		}
-  		else{
-  			target.style.cursor="auto";	
-  		}
-  	},
-  	onMouseMove:function(evt){
+	this.handler = {
+		cut:false,
+		mousedown:function(evt){
+		  		var target = evt.target;
+		  		var x = evt.offsetX;
+		  		var y = evt.offsetY;
+		  		var btn = (evt.button==1)? 0: evt.button;
+		  		
+		  		if(currentImage){
+		  			
+		  				//ask if the state of the image is true, then the image is able for to moving 
+		  				/*if(currentImage.getCut().state){
+		  					target.style.cursor="move";
+		  					currentImage.initMove(x,y);
+		  				}*/
+		  			self.setEdition(true);
+		  				self.initCut(x,y);
+		  				target.style.cursor="crosshair";
+		  		}
+		  		else{
+		  			(evt.button==0)&&self.setCurrentimage(x, y); // if the buttom clicked is the left
+		  			target.style.cursor="auto";	
+		  		}
+	  	},
+	  	mousemove:function(evt){
+	  		var target = evt.target;
+	  		if(currentImage){
 
-  		var pos = evt.nativeEvent;
-  		var target = evt.target;
-  		var x = pos.offsetX;
-  		var y = pos.offsetY;
-  		//current = (current!=null)?MajoCreator.getCurrent():null;
-  		//console.log(current);
-  		if(current){
-  			//it's drawing a rectangle for the cut
-  			if(MajoCreator.getEdition()){
-	  			if(x<current.x) x = current.x;
-	  			if(x>(current.x + current.w)) x = current.x+current.w;
-	  			if(y<current.y) y = current.y;
-	  			if(y>(current.y + current.h)) y = current.y+current.h;
-	  			var w = x - current.getCut().sx;
-	  			var h = y - current.getCut().sy;
-	  			MajoCreator.setCut(w,h);
-  			}
+		  		var x = evt.offsetX;
+		  		var y = evt.offsetY;
+	  			//it's drawing a rectangle for the cut
+	  			if(self.getEdition()){
+		  			if( x < currentImage.x) x = currentImage.x;
+		  			if( x > (currentImage.x + currentImage.w)) x = currentImage.x + currentImage.w;
+		  			if( y < currentImage.y) y = currentImage.y;
+		  			if( y > (currentImage.y + currentImage.h)) y = currentImage.y + currentImage.h;
+		  			var w = x - currentImage.getCut().sx;
+		  			var h = y - currentImage.getCut().sy;
+		  			self.setCut(w,h);
+	  			}
+	  			//put the cursor and move the image
+	  			if(target.style.cursor!="move"){
+					if(!self.getEdition()){
+						target.style.cursor="zoom-in";
+					}else{
+						target.style.cursor="auto"
+					}
+	   			}else{
+	   				//currentImage.move(x,y);
+	   			}
+	   			//change the cursor when it's leaving  the current image
+	   			if((x > currentImage.x && x < (currentImage.x+currentImage.w)) && (y > currentImage.y && y < (currentImage.y + currentImage.h))){
 
-  			//put the cursor and move the image
-  			if(target.style.cursor!="move"){
-				if(!MajoCreator.getEdition()){
-					target.style.cursor="zoom-in";
-				}else{
-					target.style.cursor="auto"
-				}
-   			}else{
-   				current.move(x,y);
-   			}
-   			//change the cursor when it leaves of current image
-   			if((x > current.x && x < (current.x+current.w)) && (y > current.y && y < (current.y + current.h))){
-
-  			}else{
-  				target.style.cursor="auto"
+	  			}else{
+	  				self.setEdition(false);
+	  				currentImage = null;
+	  				target.style.cursor="auto"
+		  		}
+	  		}else{
+	  			target.style.cursor="auto";
 	  		}
-  		}else{
-  			target.style.cursor="auto";
-  		}
-  	},
-  	contextMenu: function(e) {
-    	
-    	//e.preventDefault();
-   	// addMenu.popup(e.clientX, e.clientY);
-	},
-	//when the mouse up on image, it shows the menu for to cut the image
-  	onMouseUp:function(evt){
-  		var pos = evt.nativeEvent;
-  		var target = evt.target;
-  		current = MajoCreator.getCurrent();
-  		var x = pos.offsetX;
-  		var y = pos.offsetY;
-  		if(MajoCreator.getEdition()){
-  			current.endCut(x,y);
-  			MajoCreator.setEdition(false);
-  			$("#pruebadiv").css({'top' : pos.offsetY-60 + 'px'});
-  			$("#pruebadiv").css({'left' : pos.offsetX-20 + 'px'});
-  			$("#pruebadiv").css({visibility : 'visible'});
-		}
-  		target.style.cursor="auto";
-  	},//clicked the menu for to cut the image
-  	onClickcut:function(evt){
-  		if(Number.parseInt(evt.target.id)==1){
-  			current.cut();
-  		}else{
-  			current.noCut();
-  			current = null;
-  			$("#pruebadiv").css({visibility : 'hidden'});
-  			
-  		}
-  	},
-  	onWheel:function(evt){
-  		
-  	},
-  	ondrop:function(evt){
-  		evt.preventDefault();
-  		// evt.stopPropagation();
-  		var self = this;
-        var c = document.createElement("canvas");
-        c.width = 700;
-        c.height = 500;
-        var ct = c.getContext("2d");
-        ct.imageSmoothingEnabled = true;
-    	ct.mozImageSmoothingEnabled = true;
-   		ct.webkitImageSmoothingEnabled = true;
-    	ct.msImageSmoothingEnabled = true;
-		var files = evt.dataTransfer.files;
-		var len = files.length;
-		if( len > 0){
-
-			var i=0;
-			var fr = new FileReader();
-			var name='';
-			fr.onload = function(evt){
-					var l = MajoCreator.getImageLength();
-					MajoCreator.newImagenground(evt.target.result,len);
-	                var urlimage = evt.target.result;
-					var minimg = [{
-						id:l,
-						src:urlimage,
-						alt:name
-					}];
-					self.addImageList(minimg);
-					if(i<len){
-						if(files[i].type.indexOf("image")>=0){
-							name = files[i].name.split(".")[0];
-							fr.readAsDataURL(files[i]);
-						}
-					}
-					i++;
-			};
-				if(files[i].type.indexOf("image")>=0){
-					name = files[i].name.split(".")[0];
-					fr.readAsDataURL(files[i]);
-					i++;
-				}
-		}else{
-			if(evt.dataTransfer.getData("text")){
-				var strimage = evt.dataTransfer.getData("text");
-				//veryfy if the source type if jgp or png
-				if(strimage.match(/jpg|png/)){
-					var img = new Image();
-					img.crossOrigin ="Anonymous";
-					img.onload = function(){
-						ct.drawImage(img,0,0,700,500);
-		                var src = c.toDataURL();
-		                 var len = MajoCreator.getImageLength();
-		                MajoCreator.newImagenground(src,len);
-		                var urlimage =src;
-		                var altext = "Majo Meme"
-						var minimg = [{
-							id:len,
-							src:urlimage,
-							alt:altext
-						}];
-						self.addImageList(minimg);
-					}
-					img.src = evt.dataTransfer.getData("text");
-				}else{
-					//show the msgbox for to indicate the error
-					alert("Don't load this type, the image sorce is inadequate")
-				}
-				
+	  	},
+	  	contextmenu: function(e) {
+	    	
+	    	e.preventDefault();
+	   	// addMenu.popup(e.clientX, e.clientY);
+		},
+		//when the mouse up on image, it shows the menu for to cut the image
+	  	mouseup:function(evt){
+	  		
+	  		var target = evt.target;
+	  		var x = evt.offsetX;
+	  		var y = evt.offsetY;
+	  		if(self.getEdition()){
+	  			currentImage.endCut(x,y);
+	  			self.setEdition(false);
+	  			currentImage.cut();
+	  			/*$("#pruebadiv").css({'top' : y - 60 + 'px'});
+	  			$("#pruebadiv").css({'left' : x -20 + 'px'});
+	  			$("#pruebadiv").css({visibility : 'visible'});*/
 			}
-		}
-		evt.target.style.cursor = 'auto'
-		evt.target.className = ''
-  	},
-  	dragover:function(evt){
-  		evt.target.className = 'copy'
-  		evt.preventDefault();
-  	},
-  	dragleave:function(evt){
-  		evt.target.style.cursor='not-allowed'
-  		evt.preventDefault();
-  	},
-  	addNewTextMeme:function(evt){	
-  		MajoCreator.newText(1);
-  	},
-  	addNewTextStandar:function(evt){
-  		if(MajoCreator.getImageLength()>0) MajoCreator.newText(2);
-  	},	
-  	shareMeme:function(evt){
-  		MajoCreator.share();
-  		
-  	},
-  	send:function(){
-  		MajoCreator.send();
-  	},
-  	*/
+	  		target.style.cursor="auto";
+	  	},//clicked the menu for to cut the image
+	  	clickcut:function(evt){
+	  		if(Number.parseInt(evt.target.id)==1){
+	  			current.cut();
+	  		}else{
+	  			current.noCut();
+	  			current = null;
+	  			$("#pruebadiv").css({visibility : 'hidden'});
+	  			
+	  		}
+	  	},
+	  	wheel:function(evt){
+	  		
+	  	},
+	  	drop:function(evt){
+	  		evt.preventDefault();
+	  		// evt.stopPropagation();
+	  		var self = this;
+	        var c = document.createElement("canvas");
+	        c.width = 700;
+	        c.height = 500;
+	        var ct = c.getContext("2d");
+	        ct.imageSmoothingEnabled = true;
+	    	ct.mozImageSmoothingEnabled = true;
+	   		ct.webkitImageSmoothingEnabled = true;
+	    	ct.msImageSmoothingEnabled = true;
+			var files = evt.dataTransfer.files;
+			var len = files.length;
+			if( len > 0){
+
+				var i=0;
+				var fr = new FileReader();
+				var name='';
+				fr.onload = function(evt){
+						
+						self.newImagen(evt.target.result);
+		                /*var urlimage = evt.target.result;
+						var minimg = [{
+							id:l,
+							src:urlimage,
+							alt:name
+						}];
+						self.addImageList(minimg);*/
+						if(i<len){
+							if(files[i].type.indexOf("image")>=0){
+								name = files[i].name.split(".")[0];
+								fr.readAsDataURL(files[i]);
+							}
+						}
+						i++;
+				};
+					if(files[i].type.indexOf("image")>=0){
+						name = files[i].name.split(".")[0];
+						fr.readAsDataURL(files[i]);
+						i++;
+					}
+			}else{
+				if(evt.dataTransfer.getData("text")){
+					var strimage = evt.dataTransfer.getData("text");
+					//veryfy if the source type if jgp or png
+					if(strimage.match(/jpg|png/)){
+						var img = new Image();
+						img.crossOrigin ="Anonymous";
+						img.onload = function(){
+							ct.drawImage(img,0,0,700,500);
+			                var src = c.toDataURL();
+			                 var len = MajoCreator.getImageLength();
+			                MajoCreator.newImagenground(src,len);
+			                var urlimage =src;
+			                var altext = "Majo Meme"
+							var minimg = [{
+								id:len,
+								src:urlimage,
+								alt:altext
+							}];
+							self.addImageList(minimg);
+						}
+						img.src = evt.dataTransfer.getData("text");
+					}else{
+						//show the msgbox for to indicate the error
+						alert("Don't load this type, the image sorce is inadequate")
+					}
+				}
+			}
+			evt.target.style.cursor = 'auto'
+			evt.target.className = ''
+	  	},
+	  	dragover:function(evt){
+	  		evt.target.className = 'copy'
+	  		evt.preventDefault();
+	  	},
+	  	dragleave:function(evt){
+	  		evt.target.style.cursor='not-allowed'
+	  		evt.preventDefault();
+	  	},
+	  	shareMeme:function(evt){
+	  		self.share();
+	  	},
+	  	send:function(){
+	  		self.send();
+	  	},
+ 	 }
 }).apply(majo.creator);
