@@ -205,8 +205,7 @@ var majo = majo || {};
 		},
 		componentDidMount: function () {
 			majo.observer.attach("send");
-			majo.observer.attach("addNewTextMeme");
-			majo.observer.attach("addNewTextStandar");
+			majo.observer.attach("newText", this.limitedText);
 			majo.observer.attach("shareMeme");
 			majo.observer.attach("shareMeme");
 			majo.observer.attach("newImagen", this.addImage);
@@ -227,11 +226,12 @@ var majo = majo || {};
 			});
 		},
 		addNewTextMeme: function (evt) {
-			//MaoCreator.newText(1);
+			majo.observer.notify("newText", 1);
 		},
 		addNewTextStandar: function (evt) {
-			//if(MajoCreator.getImageLength()>0) MajoCreator.newText(2);
+			majo.observer.notify("newText", 1);
 		},
+		limitedText: function () {},
 		shareMeme: function (evt) {
 			MajoCreator.share();
 		},
@@ -323,7 +323,6 @@ var majo = majo || {};
 								"Not"
 							)
 						),
-						React.createElement("svg", { id: "sgvcanvas", xmlns: "http://www.w3.org/2000/svg" }),
 						React.createElement(
 							"div",
 							{ id: "contenttext" },

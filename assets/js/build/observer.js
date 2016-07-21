@@ -51,6 +51,10 @@ var majo = majo || {};
 		(remove.state)&&self.observer.reciveNotify("removeImagen", remove.id);
 	}
 
+	subject.newText = function(data){
+		var text = self.creator.newText(data);
+		(!text.let)&&self.observer.reciveNotify("newText", text);
+	};
 	this.view.show();
 	this.creator.initialize();
 }).apply(majo);

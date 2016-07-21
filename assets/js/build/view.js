@@ -157,8 +157,7 @@ var Creator =React.createClass({
 	},
 	componentDidMount: function() {
 		majo.observer.attach("send");
-		majo.observer.attach("addNewTextMeme");
-		majo.observer.attach("addNewTextStandar");
+		majo.observer.attach("newText",this.limitedText);
 		majo.observer.attach("shareMeme");
 		majo.observer.attach("shareMeme");
 		majo.observer.attach("newImagen", this.addImage);
@@ -179,11 +178,14 @@ var Creator =React.createClass({
 			});	
   	},
   	addNewTextMeme:function(evt){	
-  		//MaoCreator.newText(1);
+  		majo.observer.notify("newText", 1);
   	},
   	addNewTextStandar:function(evt){
-  		//if(MajoCreator.getImageLength()>0) MajoCreator.newText(2);
-  	},	
+  		majo.observer.notify("newText", 1);
+  	},
+  	limitedText: function(){
+
+  	},
   	shareMeme:function(evt){
   		MajoCreator.share();
   		
@@ -225,8 +227,7 @@ var Creator =React.createClass({
 			</div>
 				<div id="pruebadiv"><br/><button id="1" onClick={this.onClickcut}>Yes</button><button id="0" onClick={this.onClickcut}>Not</button></div>
 
-				<svg id="sgvcanvas" xmlns="http://www.w3.org/2000/svg">
-				</svg>
+				
 
 				<div id="contenttext">
 					<canvas id="canvas" onMouseUp={this.onMouseUp} onMouseMove={this.onMouseMove} onMouseDown={this.onMouseDown}  onContextMenu={this.contextMenu} onDrop={this.ondrop} onDragOver={this.dragover} onDragLeave={this.dragleave}>
