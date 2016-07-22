@@ -31,10 +31,7 @@ var majo = majo || {};
 		else
 			listeners[handler].push(null);
 	}
-	subject.Search = function(data){
-		//call to model 
-		self.model.getDataImage(data.strsearch,"Search");
-	};
+	
 	this.observer.reciveNotify= function(handler, data){
 		if(listeners.hasOwnProperty(handler)){
 			i=0;
@@ -54,6 +51,13 @@ var majo = majo || {};
 	subject.newText = function(data){
 		var text = self.creator.newText(data);
 		(!text.let)&&self.observer.reciveNotify("newText", text);
+	};
+	subject.Search = function(data){
+		//call to model 
+		self.model.getDataImage(data.strsearch,"Search");
+	};
+	subject.shareMeme = function(data){
+		self.creator.share(data)
 	};
 	this.view.show();
 	this.creator.initialize();

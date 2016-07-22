@@ -158,8 +158,7 @@ var Creator =React.createClass({
 	componentDidMount: function() {
 		majo.observer.attach("send");
 		majo.observer.attach("newText",this.limitedText);
-		majo.observer.attach("shareMeme");
-		majo.observer.attach("shareMeme");
+		majo.observer.attach("shareMeme",this.sharesucces);
 		majo.observer.attach("newImagen", this.addImage);
 		majo.observer.attach("removeImagen", this.removeImagen);
     	//MajoCreator.initialize("canvas");
@@ -181,19 +180,20 @@ var Creator =React.createClass({
   		majo.observer.notify("newText", 1);
   	},
   	addNewTextStandar:function(evt){
-  		majo.observer.notify("newText", 1);
+  		majo.observer.notify("newText", 2);
   	},
   	limitedText: function(){
 
   	},
+  	sharesucces:function(){
+
+  	},
   	shareMeme:function(evt){
-  		MajoCreator.share();
-  		
+  		majo.observer.notify("shareMeme", 1);
   	},
   	send:function(){
   		MajoCreator.send();
   	},
-  	
 	render: function(){
 		var gridstyle = this.props.gridstyle;
 		var rowstyle = [];
@@ -222,15 +222,11 @@ var Creator =React.createClass({
 			<div id="make" >
 			<div id="imagelist">
 				{data.map(function(result){
-					return <Imagen key={result.id} data={result}/>
+					return <Imagen key={result.id} data={result} />
 				})}
-			</div>
-				<div id="pruebadiv"><br/><button id="1" onClick={this.onClickcut}>Yes</button><button id="0" onClick={this.onClickcut}>Not</button></div>
-
-				
-
+			</div>			
 				<div id="contenttext">
-					<canvas id="canvas" onMouseUp={this.onMouseUp} onMouseMove={this.onMouseMove} onMouseDown={this.onMouseDown}  onContextMenu={this.contextMenu} onDrop={this.ondrop} onDragOver={this.dragover} onDragLeave={this.dragleave}>
+					<canvas id="canvas" >
 					</canvas>
 				</div>	
 					<div id="layout">

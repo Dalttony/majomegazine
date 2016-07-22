@@ -206,8 +206,7 @@ var majo = majo || {};
 		componentDidMount: function () {
 			majo.observer.attach("send");
 			majo.observer.attach("newText", this.limitedText);
-			majo.observer.attach("shareMeme");
-			majo.observer.attach("shareMeme");
+			majo.observer.attach("shareMeme", this.sharesucces);
 			majo.observer.attach("newImagen", this.addImage);
 			majo.observer.attach("removeImagen", this.removeImagen);
 			//MajoCreator.initialize("canvas");
@@ -229,16 +228,17 @@ var majo = majo || {};
 			majo.observer.notify("newText", 1);
 		},
 		addNewTextStandar: function (evt) {
-			majo.observer.notify("newText", 1);
+			majo.observer.notify("newText", 2);
 		},
 		limitedText: function () {},
+		sharesucces: function () {},
 		shareMeme: function (evt) {
-			MajoCreator.share();
+
+			majo.observer.notify("shareMeme", 1);
 		},
 		send: function () {
 			MajoCreator.send();
 		},
-
 		render: function () {
 			var gridstyle = this.props.gridstyle;
 			var rowstyle = [];
@@ -310,23 +310,8 @@ var majo = majo || {};
 						),
 						React.createElement(
 							"div",
-							{ id: "pruebadiv" },
-							React.createElement("br", null),
-							React.createElement(
-								"button",
-								{ id: "1", onClick: this.onClickcut },
-								"Yes"
-							),
-							React.createElement(
-								"button",
-								{ id: "0", onClick: this.onClickcut },
-								"Not"
-							)
-						),
-						React.createElement(
-							"div",
 							{ id: "contenttext" },
-							React.createElement("canvas", { id: "canvas", onMouseUp: this.onMouseUp, onMouseMove: this.onMouseMove, onMouseDown: this.onMouseDown, onContextMenu: this.contextMenu, onDrop: this.ondrop, onDragOver: this.dragover, onDragLeave: this.dragleave })
+							React.createElement("canvas", { id: "canvas" })
 						),
 						React.createElement(
 							"div",
