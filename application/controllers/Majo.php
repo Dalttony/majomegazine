@@ -22,11 +22,13 @@ class Majo extends CI_Controller{
 	public function index(){
 		
 		$data["title"]="Primer App";
-		//echo "s".$this->input->cookie('majo_prefer');
-		/*if(!empty($this->input->cookie('majo_prefer')) && !empty($this->input->cookie('majo_network')))
+		$data["access_token"] =  array($this->session->userdata('access_token'),$this->session->userdata('access_token_secret'));
+		$user = $this->input->cookie('majo_prefer');
+		$network = $this->input->cookie('majo_network');
+		if(isset($user) && isset($network))
 		{
 			//verify if the user exist and set the data for the user
-			$user = $this->Majo_model->getUser($this->input->cookie('majo_prefer'),$this->input->cookie('majo_network'));	
+			$user = $this->Majo_model->getUser($$user, $network);	
 			
 			if($user['is']){
 				$data['name'] = $user['user_name'];
@@ -43,10 +45,9 @@ class Majo extends CI_Controller{
 			}
 		}else{
 			$data['is_user'] = FALSE;
-
-		}*/
+		}
 		
-		$this->load->view("majo/create/create",$data);
+		$this->load->view("majo/create/create", $data);
 	}
 
 	public function _getMeme(){
