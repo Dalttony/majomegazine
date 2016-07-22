@@ -11,7 +11,7 @@ majo.creator = majo.creator || {};
 		square: 0,
 		idcanvas: "canvas",
 		idsvg: "sgvcanvas",
-		padding:15, //Padding Canvas
+		padding:10, //Padding Canvas
 		maximg:8 //Maximun number into canvas
 	};
 	var self = this;
@@ -61,7 +61,6 @@ majo.creator = majo.creator || {};
 		canvas.addEventListener("drop",this.handler.drop);
 		canvas.addEventListener("dragover",this.handler.dragover);
 		canvas.addEventListener("dragleave",this.handler.dragleave);
-		console.log(Object.create(canvas));
 		//canvas.addEventListener("drop",dropImage,true);
 		//canvas.addEventListener("dragover",overImage,true);
 		ctx = canvas.getContext("2d");
@@ -82,9 +81,9 @@ majo.creator = majo.creator || {};
 		this.ctx = this.cvtext.getContext("2d");
 		this.root = document.getElementById("contenttext");
 		this.ele = document.createElement("div");
-		var self = this;
-		var current =false;
+		var current = null;
 		this.id=id;
+		var self = this;
 		var color={
 			white:"rgb(255,255,255)", //white
 			black:"rgb(0,0,0)",
@@ -173,70 +172,89 @@ majo.creator = majo.creator || {};
 		var x,y;
 
 		this.onMouseMove = function(evt){
-			/*self.getPos().x+=1;
-			self.getPos().y+=1;
-			evt.target.style.left = self.getPos().x+"px";
-			evt.target.style.top = self.getPos().y+"px";*/
-		//	console.log(evt);
 			
-			/*if(current){
-				var x1=evt.offsetX;
-				var y1=evt.offsetY;
-				var mx,my;
-				mx=x1-x;
-				my=y1-y;
-				if(mx>0){
-					self.getPos().x+=mx;
+			//console.log(evt.offsetHeight+"-h w-"+evt.offsetWidth);
+			
+			if(currenttext){
+				if((currenttext.getPos().x > 0  &&  currenttext.getPos().x + evt.target.offsetWidth <= conf.cvw ) && (currenttext.getPos().y > 0  &&  currenttext.getPos().y + evt.target.offsetHeight <= conf.cvh)){
 					
+						x = currenttext.getPos().x;
+						y = currenttext.getPos().y
+						currenttext.getPos().x = evt.clientX - this.parentx - this.disxw;
+						currenttext.getPos().y = evt.clientY - this.parenty - this.disyh;
+				}else{
+					currenttext.getPos().x = x;
+					currenttext.getPos().y = y;
+					console.log(currenttext.getPos().x+evt.target.offsetWidth,conf.cvw);
+					console.log(currenttext.getPos().y+evt.target.offsetWidth,conf.cvh);
 				}
-				else
-				{
-					if(mx<0){
-						self.getPos().x-=mx;
-						evt.target.style.left = self.getPos().x+"px";
-					}
-				}
-				/*if(my>0){
-					self.getPos().y+=my;
-				}
-				if(my<0){
-					self.getPos().y-=my;
-				}*/
-				//evt.target.style.left = self.getPos().x+"px";
-				//evt.target.style.top = self.getPos().y+"px";
-					/*evt.target.style.left = evt.x+"px";
-				evt.target.style.top =evt.y+"px";
-				console.log(mx,my);
-				x=x1;
-				y=y1;
-			}*/
+				evt.target.style.left = currenttext.getPos().x+"px";
+				evt.target.style.top = currenttext.getPos().y+"px";
+			}	
 		};	
 		//move te text in the image 
 		this.onMouseDown = function(evt){
 			
-			evt.target.className ="text "+self.getClass();
-			evt.target.setAttribute("contentEditable","false");
+//			evt.target.className ="text "+self.getClass();
+			
+	evt.target.setAttribute("contentEditable","false");
 			evt.target.removeAttribute("resize");
-			current=true;
-			x=evt.offsetX;
-			y=evt.offsetY;
+
+			self.setCurrenttext(evt.target.id.split("-")[1]);
+			//calculate distance of mouse position event and text bound 
+			this.disxw =  evt.target.offsetWidth - evt.offsetX;
+			this.disyh = evt.target.offsetHeight - evt.offsetY;
+			
+			this.disxw = evt.target.offsetWidth -  this.disxw;
+			this.disyh = evt.target.offsetHeight -  this.disyh;
+			
+			this.parentx = evt.clientX - evt.target.offsetLeft - evt.offsetX ;
+			this.parenty = evt.clientY - evt.target.offsetTop - evt.offsetY;
+			
 			evt.target.style.cursor ="move";
 		};
 		this.onMouseUp = function(evt){
-			evt.target.style.cursor ="auto";
-			current=false;
-			
-		};
-		this.onClick = function(evt){
 			evt.target.className +=" active";
 			evt.target.setAttribute("contentEditable","true");
+			evt.target.style.cursor ="auto";
 			evt.target.focus();
+			currenttext= null;
+		};
+		this.onClick = function(evt){
+			
 		};
 		this.onMouseEnter = function(evt){
 			evt.target.className +=" active";
 		};
 		this.onMouseLeave = function(evt){
+			current = null;
 			evt.target.className ="text "+self.getClass();
+		};
+
+		this.setCurrenttext = function(id){
+			var len = textsource.length;
+			if( len > 0)
+			{	
+				i=0;
+				for (; i < len; i++) {
+					//if((x > textsource[i].getPos().x && x < (textsource[i].getPos().x+textsource[i].getPos().w)) && (y > textsource[i].getPos().y && y < (textsource[i].getPos().y + textsource[i].getPos().h))){
+					if(id == textsource[i].id){
+						if(currenttext === textsource[i]){
+							
+							return currenttext;
+						}
+						else{
+							currenttext = textsource[i];
+							return currenttext;
+						}
+					}
+				}
+			}
+			else
+			{
+				currentImage = null;
+				return null;
+			}
 		};
 		this.add();
 	}
@@ -351,9 +369,11 @@ majo.creator = majo.creator || {};
 			this.root.appendChild(this.ele);
 			this.ele.onblur = this.onfocusout;
 			this.ele.onclick = this.onClick;
-			this.ele.onmousemove = this.onMouseMove;
-			this.ele.onmouseup=this.onMouseUp;
-			this.root.onmousedown=this.onMouseDown;
+			
+			this.root.addEventListener("mousemove", this.onMouseMove);
+			this.ele.onmouseup = this.onMouseUp;
+			this.root.onmousedown = this.onMouseDown;
+//			this.root.onmousemove = this.onMouseDown;
 			//this.ele.ondblclick = this.onMousedbClick;
 			this.ele.onresize = this.onResize;
 			this.ele.focus();
@@ -368,7 +388,7 @@ majo.creator = majo.creator || {};
 			//parse to sgv to base64 encode
 			reader.readAsDataURL(svg); 
 			 reader.onloadend = function() {
-			                base64data = reader.result;                
+			                var base64data = reader.result;                
 			            
 			                img.src = base64data;
 			  }
@@ -431,8 +451,6 @@ majo.creator = majo.creator || {};
 	
 
 	var TextStandard = function(id){
-		
-
 		this.rotate = function(ang){
  
 		};
@@ -821,7 +839,6 @@ majo.creator = majo.creator || {};
 			var text = new TextStandard(textsource.length);	
 		}
 		textsource.push(text);
-		currenttext = text;
 	};
 	this.getImageLength = function(){
 		return imagenSorce.length;
@@ -901,6 +918,7 @@ majo.creator = majo.creator || {};
 			textsource[i].draw();			
 		}
 		textsource.splice(0,textsource.length);
+		this.send();
 	}
 	this.send = function(){
 		
@@ -1573,31 +1591,7 @@ majo.creator = majo.creator || {};
 		}
 	};
 
-	this.setCurrenttext = function(x,y){
-		var len = textsource.length;
-		if( len > 0)
-		{	
-			i=0;
-			for (; i < len; i++) {
-				if((x > textsource[i].getPos().x && x < (textsource[i].getPos().x+textsource[i].getPos().w)) && (y > textsource[i].getPos().y && y < (textsource[i].getPos().y + textsource[i].getPos().h))){
-					if(currenttext === textsource[i]){
-						
-						return currenttext;
-					}
-					else{
-						currenttext = textsource[i];
-						textsource[i].setCurrent();
-						return textsource;
-					}
-				}
-			}
-		}
-		else
-		{
-			currentImage = null;
-			return null;
-		}
-	};
+	
 //**--------------- Finish event interact
 	this.getCurrent = function(){
 		return currentImage;
@@ -1694,6 +1688,7 @@ majo.creator = majo.creator || {};
 	  		}else{
 	  			target.style.cursor="auto";
 	  		}
+	  		evt.stopPropagation();
 	  	},
 	  	contextmenu: function(e) {
 	    	
@@ -1810,7 +1805,7 @@ majo.creator = majo.creator || {};
 	  		evt.target.style.cursor='not-allowed'
 	  		evt.preventDefault();
 	  	},
-	  	shareMeme:function(evt){
+	  	shareMeme:function(data){
 	  		self.share();
 	  	},
 	  	send:function(){
