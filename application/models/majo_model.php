@@ -95,12 +95,13 @@ class Majo_model extends CI_Model {
     /**
      * getuser, return the  user object in the database
      */
-    public function getUser($prefer,$network){
-         $result = $this->db->get_where("user",array('autenticatedUser' => sha1($prefer)));
+    public function getUser($prefer, $network){
+         $result = $this->db->get_where("user", array('autenticatedUser' => sha1($prefer)));
          if($result->num_rows()>0){
              $row = $result->row_array();
              $row['is'] = TRUE;
-         }else{
+         }else
+         {
             $row = array('is' => FALSE);
          }
          return $row;

@@ -24,14 +24,15 @@ var ImagenMeme = React.createClass({
 	handleClick: function(evt){
 		var imgdata = {
 			id: evt.target.tabIndex,
-        	source: evt.target.src,
+        	src: evt.target.src,
         	alt: evt.target.alt,
         };
+
 		majo.observer.notify("newImagen", imgdata);
 		evt.stopPropagation();
 	},
 	render:function(){
-		return <img src={this.props.data.source} tabIndex={this.props.data.id} title={this.props.data.alt} alt={this.props.data.alt} onClick={this.handleClick} />;
+		return <img src={this.props.data.src} tabIndex={this.props.data.id} title={this.props.data.alt} alt={this.props.data.alt} onClick={this.handleClick} />;
 	}
 });
 //to create the imagen list that is using in the canvas
@@ -43,7 +44,7 @@ var Imagen = React.createClass({
 
 	},
 	onClick:function(evt){
-		majo.observer.notify("removeImagen", {id: evt.target.id });
+		majo.observer.notify("removeImagen", {id: parseInt(evt.target.id)});
 		//when you clicked it, this is removed after of verify that the image exist in the canvas
 		evt.preventDefault();
 	},
@@ -156,9 +157,10 @@ var Creator =React.createClass({
 		return ({imglist:[]})
 	},
 	componentDidMount: function() {
-		majo.observer.attach("send");
+		majo.observer.attach("editimage");
+		majo.observer.attach("share", this.sharedSucces);
 		majo.observer.attach("newText",this.limitedText);
-		majo.observer.attach("shareMeme",this.sharesucces);
+		majo.observer.attach("createdMeme",this.createdsucces);
 		majo.observer.attach("newImagen", this.addImage);
 		majo.observer.attach("removeImagen", this.removeImagen);
     	//MajoCreator.initialize("canvas");
@@ -185,14 +187,17 @@ var Creator =React.createClass({
   	limitedText: function(){
 
   	},
-  	sharesucces:function(){
+  	sharedSucces:function(data){
 
   	},
-  	shareMeme:function(evt){
-  		majo.observer.notify("shareMeme", 1);
+  	createdsucces:function(data){
+  		majo.observer.notify("share", data);
   	},
-  	send:function(){
-  		MajoCreator.send();
+  	shareMeme:function(evt){
+  		majo.observer.notify("createdMeme", 1);
+  	},
+  	editimage:function (argument) {
+  		majo.observer.notify("editimage");
   	},
 	render: function(){
 		var gridstyle = this.props.gridstyle;
@@ -218,6 +223,7 @@ var Creator =React.createClass({
 				<button onClick={this.addNewTextStandar} className="buttomtext" id="standard">A</button>
 				<button onClick={this.shareMeme} className="buttomtext" id="share">S</button>
 				<button onClick={this.send} className="buttomtext" id="share">T</button>
+				<button onClick={this.editimage} className="buttomtext" id="share">E</button>
 			</div>
 			<div id="make" >
 			<div id="imagelist">

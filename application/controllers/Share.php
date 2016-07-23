@@ -100,6 +100,7 @@ print_r($this->session->all_userdata());
 		}
 		echo json_encode($data);
 	}
+	
 	public function index(){
 		if($this->session->userdata('access_token') && $this->session->userdata('access_token_secret'))
 		{
@@ -142,9 +143,9 @@ print_r($this->session->all_userdata());
 					"error" => FALSE,
 					"request" => TRUE
 					);
-				redirect($url);
+				//redirect($url);
 				
-				//echo json_encode($data);
+				echo json_encode($data);
 			}
 			else
 			{

@@ -8,9 +8,7 @@ var majo = majo || {};
 	var subject = {}
 	var i=0;
 	//to aggregate new Image in canvas 
-	subject.newImagen = function(data){
-		var newdata = self.creator.newImagen(data);	
-	};
+	
 	//to notify the function to run
 	this.observer.notify = function(handler, data){
 		if(listeners.hasOwnProperty(handler)){
@@ -32,7 +30,7 @@ var majo = majo || {};
 			listeners[handler].push(null);
 	}
 	
-	this.observer.reciveNotify= function(handler, data){
+	this.observer.receiveNotify= function(handler, data){
 		if(listeners.hasOwnProperty(handler)){
 			i=0;
 			var len = listeners[handler].length
@@ -40,25 +38,38 @@ var majo = majo || {};
 					listeners[handler][i](data);
 				};
 		}else{
-			throw(sender +"dosen't have notifier");
+			 throw(sender +"dosen't have notifier");
 		}
 	}
+	subject.newImagen = function(data){
+
+		var newdata = self.creator.newImagen(data);	
+	};
 	subject.removeImagen = function(data){
 		var remove = self.creator.deleteImage(data.id);
-		(remove.state)&&self.observer.reciveNotify("removeImagen", remove.id);
+		(remove.state)&&self.observer.receiveNotify("removeImagen", remove.id);
 	}
 
 	subject.newText = function(data){
 		var text = self.creator.newText(data);
-		(!text.let)&&self.observer.reciveNotify("newText", text);
+		(!text.let)&&self.observer.receiveNotify("newText", text);
 	};
 	subject.Search = function(data){
 		//call to model 
 		self.model.getDataImage(data.strsearch,"Search");
 	};
-	subject.shareMeme = function(data){
-		self.creator.share(data)
+	subject.createdMeme = function(){
+		self.creator.create();
 	};
+
+	subject.editimage = function(){
+		console.log("Edit");
+	};
+
+	subject.share = function(data){
+		self.model.share(data);
+	}
+
 	this.view.show();
 	this.creator.initialize();
 }).apply(majo);

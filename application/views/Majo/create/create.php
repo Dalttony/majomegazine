@@ -17,7 +17,8 @@
 <?=script_tag('assets/js/canvg.js')?>
 <!--<?=script_tag('assets/js/build/majo.js')?>-->
 <?=script_tag('assets/js/majo.js')?>
---<?=script_tag('assets/js/build/majoview.js')?>
+<?=script_tag('assets/js/build/majoview.js')?>
 <?=script_tag('assets/js/build/observer.js')?>
 <?=script_tag('assets/js/build/model.js')?>
 
+<?php var_dump($access_token); ?>

@@ -197,7 +197,7 @@ majo.creator = majo.creator || {};
 			
 //			evt.target.className ="text "+self.getClass();
 			
-	evt.target.setAttribute("contentEditable","false");
+			evt.target.setAttribute("contentEditable","false");
 			evt.target.removeAttribute("resize");
 
 			self.setCurrenttext(evt.target.id.split("-")[1]);
@@ -378,7 +378,7 @@ majo.creator = majo.creator || {};
 			this.ele.onresize = this.onResize;
 			this.ele.focus();
 		},
-		draw:function(){
+		draw:function(id){
 			var img = new Image;
 			var data = this.getHead(this.getPos().w,this.getPos().h);
 			data +=this.getBody(this.getStyle());
@@ -387,17 +387,24 @@ majo.creator = majo.creator || {};
 			var svg = new Blob([data], {type: 'image/svg+xml;charset=utf-8'});
 			//parse to sgv to base64 encode
 			reader.readAsDataURL(svg); 
-			 reader.onloadend = function() {
+			reader.onloadend = function() {
 			                var base64data = reader.result;                
-			            
 			                img.src = base64data;
-			  }
+			}
 			var self = this;
 			img.crossOrigin ="Anonymous";
 			img.onload = function () {
-			  ctx.drawImage(img, self.getPos().x, self.getPos().y,self.ele.offsetWidth,self.ele.offsetHeight);
-			 // window.open(canvas.toDataURL());
-			  self.root.removeChild(self.ele);
+				id++;
+			 ctx.drawImage(img, self.getPos().x, self.getPos().y,self.ele.offsetWidth,self.ele.offsetHeight);
+				 if(id < textsource.length){
+				 	console.log(id);
+				 	textsource[id].draw(id);
+				 }else{
+				 	majo.observer.receiveNotify("createdMeme", canvas.toDataURL());
+				 }
+
+			 //window.open(canvas.toDataURL());
+			 // self.root.removeChild(self.ele);
 			}
 		}
 	};
@@ -779,8 +786,7 @@ majo.creator = majo.creator || {};
 			this.setImage(src);
 		},
 		tempimage:function(src){
-			this.imgtemp = src;
-			console.log(this.imgtemp);
+			this.imgtemp = src;			
 		},
 		setWidth:function(w){
 			this.w=w;
@@ -846,20 +852,25 @@ majo.creator = majo.creator || {};
 	this.ableNew = function(){
 		return (imagenSorce.length <= conf.maximg) ? true:false;
 	};
-	this.newImagenground = function(src,id){
+	this.newImagenfactory = function(data){
 
-		id = imagenSorce.length
-		var img = new ImagenMeme(id)
-		img.setSource(src);
+		//id = imagenSorce.length
+		var img = new ImagenMeme(data.id)
+		img.setSource(data.src);
+		img.tempimage(data.tmpsrc);
 		imagenSorce.push(img);
 		selectGrid()
-		/*var img = new ImagenGrounder(id)
-		img.setSource(src);
-		//imagenSorce.push(img);
-		img.draw();*/
+		var minimg = [{
+					id: data.id,
+					src: data.src,
+					tmpsrc: data.tmpsrc,
+					alt: data.alt
+				}];
+		majo.observer.receiveNotify("newImagen", minimg);
 	}
 
 	this.newImagen = function(data){
+
 		//if imagen quantity is less than the quantity there are into canvas
 		var returned ={};
 		if(imagenSorce.length <= conf.maximg){
@@ -875,34 +886,19 @@ majo.creator = majo.creator || {};
 
     		imgtemp.crossOrigin ="Anonymous";
 			
-				/*var img = new ImagenMeme(imagenSorce.length)
-				//img.setSource(src);
-				img.tempimage(data.source);
-				imagenSorce.push(img);
-				selectGrid();
-				var minimg = [{
-					id: self.getImageLength(),
-					src: data.source,
-					alt: data.alt
-				}];
-				majo.observer.reciveNotify("newImagen", minimg);*/
     		imgtemp.onload = function(){
+
                 crx.drawImage(imgtemp, 0, 0, conf.cvw, conf.cvh);
                 var src = cr.toDataURL();
-				var minimg = [{
-					id: self.getImageLength(),
-					src: data.source,
+				var minimg = {
+					id: data.id,
+					src: src,
+					tmpsrc: data.source,
 					alt: data.alt
-				}];
-				var img = new ImagenMeme(imagenSorce.length)
-				img.setSource(src);
-				img.tempimage(imgtemp.src);
-				imagenSorce.push(img);
-				selectGrid();
-				majo.observer.reciveNotify("newImagen", minimg);
-				//self.model.cacheImage(newdata, "newImage");
+				};
+				self.newImagenfactory(minimg)
             }
-            imgtemp.src = data.source; 
+            imgtemp.src = data.src; 
 		}
 		else{
 			returned.created = false;
@@ -911,116 +907,26 @@ majo.creator = majo.creator || {};
 		return returned;
 	}
 
-	this.share = function(){
-		var len = textsource.length;
+	this.create = function(){
+		if(textsource.length == 0)
+		{
+			majo.observer.receiveNotify("createdMeme", canvas.toDataURL());
+		}else{
+			textsource[0].draw(0);	
+		}
+		
+		/*var len = textsource.length;
 		i=0;
 		for (; i < len; i++) {
-			textsource[i].draw();			
+			textsource[0].draw();			
 		}
-		textsource.splice(0,textsource.length);
-		this.send();
+		textsource.splice( 0, textsource.length);
+
+		return canvas.toDataURL();*/
 	}
 	this.send = function(){
 		
-		/*window.open("http://[::1]/Majocod/index.php/share/sess/","Confirmando share","status=1,height=500,width=500,location=1,status=1,scrollbars=1,modal");*/
-		var img = canvas.toDataURL();
 		
-			/*$('#loadshare').load(window.location.href+"index.php/share",{dataimage:img},function( response, status, xhr ){
-
-			});*/
-	
-		$.post(window.location.href+"index.php/share",function(data){
-			data = JSON.parse(data);
-			if(data.share){	
-				$('#confirm').modal({
-					overlayId: 'confirm-overlay',
-					containerId: 'confirm-container',
-					onShow: function (dialog) {
-						var modal = this;
-						dialog.container[0].style.width = conf.cvw+"px";
-						dialog.container[0].style.height = "auto";
-						dialog.data[0].style.width = conf.cvw+"px";
-						dialog.data[0].style.height = conf.cvh+"px";
-						$("#dataimage").attr("src", img);
-						$("#dataimage").attr("width", conf.cvw);
-						$("#dataimage").attr("height", conf.cvh);
-						$('.yes', dialog.data[0]).click(function () {
-							$.post(window.location.href+"index.php/share/postimage",{dataimage:img,texto:$("#texto").text()},function(dt){
-								
-								if(dt.shared){
-									modal.close();
-								}else{
-									//show the error
-								}
-								 // or $.modal.close();
-							});
-							
-						});
-					}
-				});
-			}
-
-			if(data.request && !data.error){
-				share=true;
-
-				// $( "#opacity" ).show();
-				 var w = conf.cvw;
-				 var h = conf.cvh;
-				 var left = (screen.width/2)-(w/2);
-  				var top = (screen.height/2)-(h/2);
-  				var a = document.createElement("a");
-				//     $("#op").attr("href", data.redirectTo).attr("target", "_blank")[0].click();
-				  //   console.log($("#op"));
-				window.open(data.redirectTo,'_blank',"Confirmando share",'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+w+', height='+h+', top='+top+', left='+left);
-				window.addEventListener('focus',function(){
-					var self = this;
-					
-					if(share){
-						$.post(window.location.href+"index.php/share/",function(data){
-							data = JSON.parse(data);
-							if(data.share){
-								//open modal container
-								$('#confirm').modal({
-									position: ["20%"],
-									overlayId: 'confirm-overlay',
-									containerId: 'confirm-container',
-									onShow: function (dialog) {
-										share=false;
-										var modal = this;
-
-										this.close(); // or $.modal.close();
-										dialog.container[0].style.width = conf.cvw+"px";
-										dialog.container[0].style.height = "auto";
-										dialog.data[0].style.width = conf.cvw+"px";
-										dialog.data[0].style.height = conf.cvh+"px";
-										$("#dataimage").attr("src", img);
-										$("#dataimage").attr("width", conf.cvw);
-										$("#dataimage").attr("height", conf.cvh);
-										$('.yes', dialog.data[0]).click(function () {
-											
-
-											$.post(window.location.href+"index.php/share/postimage",{dataimage:img,texto:$("#texto").text()},function(data){
-												data = JSON.parse(data)
-												if(data.shared){
-
-												}else{
-
-												}
-												
-											});
-											
-										});
-									}
-								});
-							}else{
-
-							}
-							window.removeEventListener('click',self);
-						});
-					}
-				});
-			}
-		});
 	};
 
 	//-----------------fin section
@@ -1063,6 +969,7 @@ majo.creator = majo.creator || {};
 		i=0;
 		var len = imagenSorce.length;
 		for (; i < len; i++) {
+			console.log(imagenSorce[i].getId(),id);
 			if(imagenSorce[i].getId() == id){
 				var id= i;
 				imagenSorce.splice(i,1);
@@ -1725,34 +1632,22 @@ majo.creator = majo.creator || {};
 	  		
 	  	},
 	  	drop:function(evt){
-	  		evt.preventDefault();
-	  		// evt.stopPropagation();
-	  		var self = this;
-	        var c = document.createElement("canvas");
-	        c.width = 700;
-	        c.height = 500;
-	        var ct = c.getContext("2d");
-	        ct.imageSmoothingEnabled = true;
-	    	ct.mozImageSmoothingEnabled = true;
-	   		ct.webkitImageSmoothingEnabled = true;
-	    	ct.msImageSmoothingEnabled = true;
+	  		
 			var files = evt.dataTransfer.files;
 			var len = files.length;
 			if( len > 0){
-
 				var i=0;
 				var fr = new FileReader();
 				var name='';
 				fr.onload = function(evt){
+						var imgdata = {
+								id: self.getImageLength(),
+					        	src: evt.target.result,
+					        	tmpsrc: evt.target.result,
+					        	alt: "",
+					        };
+						self.newImagenfactory(imgdata)
 						
-						self.newImagen(evt.target.result);
-		                /*var urlimage = evt.target.result;
-						var minimg = [{
-							id:l,
-							src:urlimage,
-							alt:name
-						}];
-						self.addImageList(minimg);*/
 						if(i<len){
 							if(files[i].type.indexOf("image")>=0){
 								name = files[i].name.split(".")[0];
@@ -1761,33 +1656,26 @@ majo.creator = majo.creator || {};
 						}
 						i++;
 				};
-					if(files[i].type.indexOf("image")>=0){
+
+				if(files[i].type.indexOf("image")>=0){
 						name = files[i].name.split(".")[0];
 						fr.readAsDataURL(files[i]);
 						i++;
 					}
 			}else{
 				if(evt.dataTransfer.getData("text")){
+					console.log(evt.dataTransfer.getData());
 					var strimage = evt.dataTransfer.getData("text");
 					//veryfy if the source type if jgp or png
 					if(strimage.match(/jpg|png/)){
-						var img = new Image();
-						img.crossOrigin ="Anonymous";
-						img.onload = function(){
-							ct.drawImage(img,0,0,700,500);
-			                var src = c.toDataURL();
-			                 var len = MajoCreator.getImageLength();
-			                MajoCreator.newImagenground(src,len);
-			                var urlimage =src;
-			                var altext = "Majo Meme"
-							var minimg = [{
-								id:len,
-								src:urlimage,
-								alt:altext
-							}];
-							self.addImageList(minimg);
-						}
-						img.src = evt.dataTransfer.getData("text");
+
+						 var imgdata = {
+						 		id: self.getImageLength(),
+					        	src: evt.dataTransfer.getData("text"),
+					        	tmpsrc: evt.dataTransfer.getData("text"),
+					        	alt: "",
+					        };
+						self.newImagen(imgdata)
 					}else{
 						//show the msgbox for to indicate the error
 						alert("Don't load this type, the image sorce is inadequate")
@@ -1796,6 +1684,8 @@ majo.creator = majo.creator || {};
 			}
 			evt.target.style.cursor = 'auto'
 			evt.target.className = ''
+			evt.preventDefault();
+	  		evt.stopPropagation();
 	  	},
 	  	dragover:function(evt){
 	  		evt.target.className = 'copy'
