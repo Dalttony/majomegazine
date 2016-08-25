@@ -23,7 +23,7 @@ var majo = majo || {};
 			evt.stopPropagation();
 		},
 		render: function () {
-			return React.createElement("img", { src: this.props.data.src, tabIndex: this.props.data.id, title: this.props.data.alt, alt: this.props.data.alt, onClick: this.handleClick });
+			return React.createElement("img", { src: this.props.data.source, tabIndex: this.props.data.id, title: this.props.data.alt, alt: this.props.data.alt, onClick: this.handleClick });
 		}
 	});
 	//to create the imagen list that is using in the canvas
@@ -56,6 +56,7 @@ var majo = majo || {};
 				"div",
 				{ id: "ImageSeacrhed" },
 				dataimage.map(function (data) {
+					console.log(data);
 					return React.createElement(ImagenMeme, { key: data.id, onkey: data.id, data: data, onNew: self.onNewImagen });
 				})
 			);
@@ -235,10 +236,17 @@ var majo = majo || {};
 		limitedText: function () {},
 		sharedSucces: function (data) {},
 		createdsucces: function (data) {
-			majo.observer.notify("share", data);
+			majo.observer.notify("share", { nt: this.nt, data: data });
 		},
 		shareMeme: function (evt) {
-			majo.observer.notify("createdMeme", 1);
+			FB.ui({
+				method: 'share_open_graph',
+				action_type: 'og.likes',
+				href: 'http://localhost/majomegazine/'
+			}, function (response) {});
+			//majo.observer.notify("createdMeme", 1);
+			//this.nt = evt.target.id.split('-')[2]; //nt flag to know when the user select the social network to share
+			//majo.observer.notify("createdMeme");
 		},
 		editimage: function (argument) {
 			majo.observer.notify("editimage");
@@ -293,16 +301,6 @@ var majo = majo || {};
 						),
 						React.createElement(
 							"button",
-							{ onClick: this.shareMeme, className: "buttomtext", id: "share" },
-							"S"
-						),
-						React.createElement(
-							"button",
-							{ onClick: this.send, className: "buttomtext", id: "share" },
-							"T"
-						),
-						React.createElement(
-							"button",
 							{ onClick: this.editimage, className: "buttomtext", id: "share" },
 							"E"
 						)
@@ -331,6 +329,30 @@ var majo = majo || {};
 								gridstyle.map(function (style) {
 									return React.createElement(StyleGrid, { key: style.id, gstyle: style });
 								})
+							)
+						),
+						React.createElement(
+							"div",
+							{ id: "sc-nt-sh" },
+							React.createElement(
+								"span",
+								{ id: "stringshare" },
+								"compartilhar com"
+							),
+							React.createElement(
+								"button",
+								{ onClick: this.shareMeme, className: "nt", id: "nt-tw-1" },
+								"twitter"
+							),
+							React.createElement(
+								"button",
+								{ onClick: this.shareMeme, className: "nt", id: "nt-fc-2" },
+								"Facebook"
+							),
+							React.createElement(
+								"button",
+								{ onClick: this.shareMeme, className: "nt", id: "nt-dw-3" },
+								"Download"
 							)
 						)
 					),

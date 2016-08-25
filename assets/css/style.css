@@ -172,6 +172,16 @@ container of text style
    	text-stroke-width: 1px;																				
    	text-stroke-color: black;
 }
+#sc-nt-sh{
+	margin-top:10px; 
+	text-align: right;
+}
+.nt{
+	border: none;
+	margin-left: 5px;
+	width: 100px;
+	height: 30px;
+}
 .standard{
 	color: white;
 }

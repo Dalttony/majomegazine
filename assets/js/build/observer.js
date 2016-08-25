@@ -59,6 +59,7 @@ var majo = majo || {};
 		self.model.getDataImage(data.strsearch,"Search");
 	};
 	subject.createdMeme = function(){
+		//console.log("Hola");
 		self.creator.create();
 	};
 

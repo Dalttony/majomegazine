@@ -32,7 +32,7 @@ var ImagenMeme = React.createClass({
 		evt.stopPropagation();
 	},
 	render:function(){
-		return <img src={this.props.data.src} tabIndex={this.props.data.id} title={this.props.data.alt} alt={this.props.data.alt} onClick={this.handleClick} />;
+		return <img src={this.props.data.source} tabIndex={this.props.data.id} title={this.props.data.alt} alt={this.props.data.alt} onClick={this.handleClick} />;
 	}
 });
 //to create the imagen list that is using in the canvas
@@ -63,6 +63,7 @@ var ContentImage = React.createClass({
 		var self=this;
 		return (
 			<div id="ImageSeacrhed">{dataimage.map(function(data){
+				console.log(data);
 				return <ImagenMeme  key={data.id} onkey={data.id} data={data} onNew={self.onNewImagen}/>
 			})}</div>
 		);
@@ -191,10 +192,18 @@ var Creator =React.createClass({
 
   	},
   	createdsucces:function(data){
-  		majo.observer.notify("share", data);
+  		majo.observer.notify("share", {nt:this.nt,data:data});
   	},
   	shareMeme:function(evt){
-  		majo.observer.notify("createdMeme", 1);
+  		FB.ui(
+		 {
+		  method: 'share_open_graph',
+		   action_type: 'og.likes',
+		  href: 'http://localhost/majomegazine/'
+		}, function(response){});
+  		//majo.observer.notify("createdMeme", 1);
+  		//this.nt = evt.target.id.split('-')[2]; //nt flag to know when the user select the social network to share
+  		//majo.observer.notify("createdMeme");
   	},
   	editimage:function (argument) {
   		majo.observer.notify("editimage");
@@ -221,8 +230,8 @@ var Creator =React.createClass({
 			<div id="textsyle">Add Text
 				<button onClick={this.addNewTextMeme} className="buttomtext" id="memetext">A</button>
 				<button onClick={this.addNewTextStandar} className="buttomtext" id="standard">A</button>
-				<button onClick={this.shareMeme} className="buttomtext" id="share">S</button>
-				<button onClick={this.send} className="buttomtext" id="share">T</button>
+				
+				
 				<button onClick={this.editimage} className="buttomtext" id="share">E</button>
 			</div>
 			<div id="make" >
@@ -240,6 +249,12 @@ var Creator =React.createClass({
 							return <StyleGrid key={style.id} gstyle={style} />
 						})}
 						</ul>
+					</div>
+					<div id="sc-nt-sh">
+					<span id='stringshare'>compartilhar com</span>
+						<button onClick={this.shareMeme} className="nt"  id='nt-tw-1'>twitter</button>
+						<button onClick={this.shareMeme} className="nt"  id='nt-fc-2'>Facebook</button>
+						<button onClick={this.shareMeme} className="nt"  id='nt-dw-3'>Download</button>
 					</div>
 			</div> 
 			<Searcher addImageList={this.addImageList}/>

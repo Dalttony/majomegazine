@@ -20,5 +20,20 @@
 <?=script_tag('assets/js/build/majoview.js')?>
 <?=script_tag('assets/js/build/observer.js')?>
 <?=script_tag('assets/js/build/model.js')?>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1013135508743319',
+      xfbml      : true,
+      version    : 'v2.5'
+    });
+  };
 
-<?php var_dump($access_token); ?>
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>

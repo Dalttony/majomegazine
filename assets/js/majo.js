@@ -379,16 +379,22 @@ majo.creator = majo.creator || {};
 			this.ele.focus();
 		},
 		draw:function(id){
+			var d = document.getElementById("middle");
+			d.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+			
 			var img = new Image;
 			var data = this.getHead(this.getPos().w,this.getPos().h);
 			data +=this.getBody(this.getStyle());
+			data += "<div xmlns='http://www.w3.org/2000/svg'>Hola menor</div>";
 			data +=this.getFooter();
 			var reader = new window.FileReader();
 			var svg = new Blob([data], {type: 'image/svg+xml;charset=utf-8'});
 			//parse to sgv to base64 encode
 			reader.readAsDataURL(svg); 
 			reader.onloadend = function() {
-			                var base64data = reader.result;                
+
+			                var base64data = reader.result;  
+			                console.log(reader.result);           
 			                img.src = base64data;
 			}
 			var self = this;
@@ -400,7 +406,9 @@ majo.creator = majo.creator || {};
 				 	console.log(id);
 				 	textsource[id].draw(id);
 				 }else{
-				 	majo.observer.receiveNotify("createdMeme", canvas.toDataURL());
+
+				 	//majo.observer.receiveNotify("createdMeme", canvas.toDataURL());
+				 	window.open(canvas.toDataURL());
 				 }
 
 			 //window.open(canvas.toDataURL());
@@ -444,8 +452,8 @@ majo.creator = majo.creator || {};
    			"-webkit-text-stroke-color: black;",
    			"text-stroke-width: 1px;",		
    			"text-stroke-color: black;",
-   			"width:"+this.ele.offsetWidth+"px",
-   			"height:"+this.ele.offsetHeight+"px"
+   			//"width:"+this.ele.offsetWidth+"px",
+   			//"height:"+this.ele.offsetHeight+"px"
 			];
 			return style;
 		};
@@ -910,8 +918,10 @@ majo.creator = majo.creator || {};
 	this.create = function(){
 		if(textsource.length == 0)
 		{
+			console.log("Entra");
 			majo.observer.receiveNotify("createdMeme", canvas.toDataURL());
 		}else{
+
 			textsource[0].draw(0);	
 		}
 		

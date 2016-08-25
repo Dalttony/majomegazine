@@ -57,7 +57,7 @@ var majo = majo || {};
   			if(this.get("imagechaced").push(data))
   				this.notify(notify, data)
   		},
-  		share:function (data) {
+  		share: function (data) {
   			console.log(data);
   			var img = data;
 				$.post(window.location.href+"index.php/share", function(data){
@@ -90,7 +90,8 @@ var majo = majo || {};
 							}
 						});
 					}
-			if(data.request && !data.error){
+				});
+			/*if(data.request && !data.error){
 				var share=true;
 
 				// $( "#opacity" ).show();
@@ -150,7 +151,7 @@ var majo = majo || {};
 					}
 				});
 			}
-		});
+		});*/
   		}
 	});
 
