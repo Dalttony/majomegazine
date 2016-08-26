@@ -144,7 +144,41 @@ container of text style
 	height: 500px;
 	position: relative;
 }
-.buttomtext{
+/*Text style*/
+.bt{
+	/*General style for the button */
+	position: relative;
+	border: none;
+	margin-top: 2px;
+	 text-decoration: none;
+	 text-align: center;
+	 box-sizing: border-box;
+	 -webkit-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	 -ms-box-sizing: border-box;
+}
+.coltex{
+	width: 50px;
+	height: 50px;
+	border-radius: 100%;
+	-webkit-border-radius: 100%;
+	-moz-border-radius: 100%;
+	-o-border-radius: 100%;
+	-ms-border-radius: 100%;
+}
+#cl1{
+	background-color: black;
+}
+#cl2{
+	background-color: red;
+}
+#cl3{
+	background-color: yellow;
+}
+#cl4{
+	background-color: green;
+}
+.buttontext{
 	position: relative;
 	border: none;
 	 color: white;
@@ -153,7 +187,7 @@ container of text style
 	  text-align: center;
 	  margin: 5px;
 }
-.buttomtext:before{
+.buttontext:before{
 	position: absolute;
 	content:"+";
 	display: block;
@@ -205,22 +239,51 @@ container of text style
 }
 .memetext{
 	font-weight: bold;
-	color: white;
-	-webkit-text-fill-color: white;
+	/*-webkit-text-fill-color: white;*/
 	-webkit-text-stroke-width: 3px;
    	-webkit-text-stroke-color: black;
-   	-moz-text-fill-color: white;
+   	/*-moz-text-fill-color: white;*/
 	-moz-text-stroke-width: 3px;
    	-moz-text-stroke-color: black;
-   	-os-text-fill-color: white;
+   /*	-os-text-fill-color: white;*/
 	-os-text-stroke-width: 3px;
    	-os-text-stroke-color: black;
-   	-ms-text-fill-color: white;
+   /*	-ms-text-fill-color: white;*/
 	-ms-text-stroke-width: 3px;
    	-ms-text-stroke-color: black;
    	text-stroke-width: 1px;
    	text-stroke-color: black;
 }
+.clrtext1{
+	text-fill-color: black;
+	-webkit-text-fill-color: black;
+	-moz-text-fill-color: black;
+	-ms-text-fill-color: black;
+	-o-text-fill-color: black;
+
+}
+.clrtext2{
+	text-fill-color: red;
+	-webkit-text-fill-color: red;
+	-moz-text-fill-color: red;
+	-ms-text-fill-color: red;
+	-o-text-fill-color: red;
+}
+.clrtext3{
+	text-fill-color: yellow;
+	-webkit-text-fill-color: yellow;
+	-moz-text-fill-color: yellow;
+	-ms-text-fill-color: yellow;
+	-o-text-fill-color: yellow;
+}
+.clrtext4{
+	text-fill-color: green;
+	-webkit-text-fill-color: green;
+	-moz-text-fill-color: green;
+	-ms-text-fill-color: green;
+	-o-text-fill-color: green;
+}
+
 .active{
 	border:2px dotted black;
 	background-color: rgba(0,0,0,0.3);

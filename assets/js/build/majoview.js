@@ -56,7 +56,6 @@ var majo = majo || {};
 				"div",
 				{ id: "ImageSeacrhed" },
 				dataimage.map(function (data) {
-					console.log(data);
 					return React.createElement(ImagenMeme, { key: data.id, onkey: data.id, data: data, onNew: self.onNewImagen });
 				})
 			);
@@ -230,6 +229,9 @@ var majo = majo || {};
 		addNewTextMeme: function (evt) {
 			majo.observer.notify("newText", 1);
 		},
+		addColorText: function (evt) {
+			majo.creator.setColorText(evt.target.id);
+		},
 		addNewTextStandar: function (evt) {
 			majo.observer.notify("newText", 2);
 		},
@@ -256,6 +258,7 @@ var majo = majo || {};
 			var rowstyle = [];
 			var data = this.state.imglist;
 			var self = this;
+			var clsname = 'coltex bt';
 			return React.createElement(
 				"div",
 				null,
@@ -288,21 +291,50 @@ var majo = majo || {};
 					React.createElement(
 						"div",
 						{ id: "textsyle" },
-						"Add Text",
+						React.createElement(
+							"span",
+							null,
+							"style text"
+						),
 						React.createElement(
 							"button",
-							{ onClick: this.addNewTextMeme, className: "buttomtext", id: "memetext" },
+							{ onClick: this.addNewTextMeme, className: "buttontext bt", id: "memetext" },
 							"A"
 						),
 						React.createElement(
 							"button",
-							{ onClick: this.addNewTextStandar, className: "buttomtext", id: "standard" },
+							{ onClick: this.addNewTextStandar, className: "buttontext bt", id: "standard" },
 							"A"
 						),
 						React.createElement(
 							"button",
-							{ onClick: this.editimage, className: "buttomtext", id: "share" },
+							{ onClick: this.editimage, className: "buttontext bt", id: "share" },
 							"E"
+						),
+						React.createElement(
+							"span",
+							null,
+							"Color text"
+						),
+						React.createElement(
+							"button",
+							{ onClick: this.addColorText, className: "coltex bt", id: "cl1" },
+							"Black"
+						),
+						React.createElement(
+							"button",
+							{ onClick: this.addColorText, className: "coltex bt", id: "cl2" },
+							"Blue"
+						),
+						React.createElement(
+							"button",
+							{ onClick: this.addColorText, className: "coltex bt", id: "cl3" },
+							"Red"
+						),
+						React.createElement(
+							"button",
+							{ onClick: this.addColorText, className: "coltex bt", id: "cl4" },
+							"yellow"
 						)
 					),
 					React.createElement(

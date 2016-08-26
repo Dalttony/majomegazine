@@ -14,6 +14,12 @@ majo.creator = majo.creator || {};
 		padding:10, //Padding Canvas
 		maximg:8 //Maximun number into canvas
 	};
+	var colortext = {
+		cl1: "#000000",
+		cl2: "#FF0000",
+		cl3: "#FFFF00",
+		cl4: "#008000"
+	};
 	var self = this;
 	var sizsquad=10;
 	var cr = document.createElement("canvas");
@@ -81,7 +87,8 @@ majo.creator = majo.creator || {};
 		this.ctx = this.cvtext.getContext("2d");
 		this.root = document.getElementById("contenttext");
 		this.ele = document.createElement("div");
-		var current = null;
+		var x,y;
+		var down=false; //know when the user clicked 
 		this.id=id;
 		var self = this;
 		var color={
@@ -93,9 +100,9 @@ majo.creator = majo.creator || {};
 			current:"rgb(0,0,0)"
 		};
 		var font={
-			size:60,
-			color:"rgb(255,255,255)",
-			letter:"Impact, Arial Black"
+			size: 60,
+			color: "rgb(255,255,255)",
+			letter: "Impact, Arial Black"
 		};
 		var pos={
 			x:10,
@@ -124,7 +131,7 @@ majo.creator = majo.creator || {};
 		this.getLines = function(){
 			return lines;
 		}
-		this.getFont=function(){
+		this.getFont = function(){
 			return font;
 		};
 
@@ -169,13 +176,11 @@ majo.creator = majo.creator || {};
 		this.onClick = function(evt){
 
 		};
-		var x,y;
-
+		
 		this.onMouseMove = function(evt){
 			
 			//console.log(evt.offsetHeight+"-h w-"+evt.offsetWidth);
-			
-			if(currenttext){
+			if(down){
 				if((currenttext.getPos().x > 0  &&  currenttext.getPos().x + evt.target.offsetWidth <= conf.cvw ) && (currenttext.getPos().y > 0  &&  currenttext.getPos().y + evt.target.offsetHeight <= conf.cvh)){
 					
 						x = currenttext.getPos().x;
@@ -185,8 +190,6 @@ majo.creator = majo.creator || {};
 				}else{
 					currenttext.getPos().x = x;
 					currenttext.getPos().y = y;
-					console.log(currenttext.getPos().x+evt.target.offsetWidth,conf.cvw);
-					console.log(currenttext.getPos().y+evt.target.offsetWidth,conf.cvh);
 				}
 				evt.target.style.left = currenttext.getPos().x+"px";
 				evt.target.style.top = currenttext.getPos().y+"px";
@@ -199,7 +202,7 @@ majo.creator = majo.creator || {};
 			
 			evt.target.setAttribute("contentEditable","false");
 			evt.target.removeAttribute("resize");
-
+			//establishing the current text
 			self.setCurrenttext(evt.target.id.split("-")[1]);
 			//calculate distance of mouse position event and text bound 
 			this.disxw =  evt.target.offsetWidth - evt.offsetX;
@@ -214,11 +217,13 @@ majo.creator = majo.creator || {};
 			evt.target.style.cursor ="move";
 		};
 		this.onMouseUp = function(evt){
+			down = false;
 			evt.target.className +=" active";
 			evt.target.setAttribute("contentEditable","true");
 			evt.target.style.cursor ="auto";
 			evt.target.focus();
-			currenttext= null;
+			
+			//currenttext= null;
 		};
 		this.onClick = function(evt){
 			
@@ -227,11 +232,12 @@ majo.creator = majo.creator || {};
 			evt.target.className +=" active";
 		};
 		this.onMouseLeave = function(evt){
-			current = null;
+			down = false;
 			evt.target.className ="text "+self.getClass();
 		};
 
 		this.setCurrenttext = function(id){
+			
 			var len = textsource.length;
 			if( len > 0)
 			{	
@@ -240,7 +246,7 @@ majo.creator = majo.creator || {};
 					//if((x > textsource[i].getPos().x && x < (textsource[i].getPos().x+textsource[i].getPos().w)) && (y > textsource[i].getPos().y && y < (textsource[i].getPos().y + textsource[i].getPos().h))){
 					if(id == textsource[i].id){
 						if(currenttext === textsource[i]){
-							
+							down = true;
 							return currenttext;
 						}
 						else{
@@ -346,11 +352,12 @@ majo.creator = majo.creator || {};
 			str+="</div>";
 			return str;
 		},
-		add:function(){
+		add : function(){
 			this.ele.className = "text active "+this.getClass();
 			this.ele.id="text-"+this.id;
 			this.ele.setAttribute("contentEditable","true");
 			this.ele.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+			this.ele.style.color = this.getFont().color;
 			this.ele.style.minWidth="10px";
 			this.ele.width = conf.cvw+"px";
 			this.ele.style.minHeight=this.getSquare().minh+"px";
@@ -378,7 +385,7 @@ majo.creator = majo.creator || {};
 			this.ele.onresize = this.onResize;
 			this.ele.focus();
 		},
-		draw:function(id){
+		draw : function(id){
 			var d = document.getElementById("middle");
 			d.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
 			
@@ -414,6 +421,10 @@ majo.creator = majo.creator || {};
 			 //window.open(canvas.toDataURL());
 			 // self.root.removeChild(self.ele);
 			}
+		},
+		setColorText : function(color){
+			this.getFont()['color'] = color;
+			this.ele.style.color = colortext[color];
 		}
 	};
 
@@ -507,9 +518,7 @@ majo.creator = majo.creator || {};
 					ctx.fillText(str,x,y);
 			}
 		};*/
-		this.setColorText = function(id){
-
-		};
+		
 		Text.call(this,id);
 	};
 
@@ -847,12 +856,13 @@ majo.creator = majo.creator || {};
 //section for to enable or to disable text and image
 	
 	this.newText = function(type){
-		if(type==1){
-			var text = new TextMeme(textsource.length);	
+
+		if(type==1){//TYPE variable indicates if text is type general meme or normal 
+			currenttext = new TextMeme(textsource.length);	
 		}else{
-			var text = new TextStandard(textsource.length);	
+			currenttext = new TextStandard(textsource.length);	
 		}
-		textsource.push(text);
+		textsource.push(currenttext);
 	};
 	this.getImageLength = function(){
 		return imagenSorce.length;
@@ -918,7 +928,6 @@ majo.creator = majo.creator || {};
 	this.create = function(){
 		if(textsource.length == 0)
 		{
-			console.log("Entra");
 			majo.observer.receiveNotify("createdMeme", canvas.toDataURL());
 		}else{
 
@@ -1490,7 +1499,6 @@ majo.creator = majo.creator || {};
 			for (; i < len; i++) {
 				if((x > imagenSorce[i].x && x < (imagenSorce[i].x+imagenSorce[i].w)) && (y > imagenSorce[i].y && y < (imagenSorce[i].y + imagenSorce[i].h))){
 					if(currentImage === imagenSorce[i]){
-						
 						return currentImage;
 					}
 					else{
@@ -1508,6 +1516,13 @@ majo.creator = majo.creator || {};
 		}
 	};
 
+	this.setColorText = function(color){
+		if(currenttext){
+			currenttext.setColorText(color);
+		}else{
+			console.log("There isn't current Text");
+		}
+	};
 	
 //**--------------- Finish event interact
 	this.getCurrent = function(){
@@ -1571,7 +1586,6 @@ majo.creator = majo.creator || {};
 	  	mousemove:function(evt){
 	  		var target = evt.target;
 	  		if(currentImage){
-
 		  		var x = evt.offsetX;
 		  		var y = evt.offsetY;
 	  			//it's drawing a rectangle for the cut
@@ -1641,6 +1655,7 @@ majo.creator = majo.creator || {};
 	  	wheel:function(evt){
 	  		
 	  	},
+	  	// this event handles the drag and drop into canvas
 	  	drop:function(evt){
 	  		
 			var files = evt.dataTransfer.files;
@@ -1661,6 +1676,7 @@ majo.creator = majo.creator || {};
 						if(i<len){
 							if(files[i].type.indexOf("image")>=0){
 								name = files[i].name.split(".")[0];
+								//when the user drops several images into canvas, it iterated the images for drawing
 								fr.readAsDataURL(files[i]);
 							}
 						}
@@ -1674,7 +1690,6 @@ majo.creator = majo.creator || {};
 					}
 			}else{
 				if(evt.dataTransfer.getData("text")){
-					console.log(evt.dataTransfer.getData());
 					var strimage = evt.dataTransfer.getData("text");
 					//veryfy if the source type if jgp or png
 					if(strimage.match(/jpg|png/)){

@@ -63,7 +63,6 @@ var ContentImage = React.createClass({
 		var self=this;
 		return (
 			<div id="ImageSeacrhed">{dataimage.map(function(data){
-				console.log(data);
 				return <ImagenMeme  key={data.id} onkey={data.id} data={data} onNew={self.onNewImagen}/>
 			})}</div>
 		);
@@ -182,6 +181,9 @@ var Creator =React.createClass({
   	addNewTextMeme:function(evt){	
   		majo.observer.notify("newText", 1);
   	},
+  	addColorText:function(evt){
+  		majo.creator.setColorText(evt.target.id);
+  	},
   	addNewTextStandar:function(evt){
   		majo.observer.notify("newText", 2);
   	},
@@ -213,6 +215,7 @@ var Creator =React.createClass({
 		var rowstyle = [];
 		var data = this.state.imglist;
 		var self = this;
+		var clsname= 'coltex bt';
 		return(
 			<div>
 			<div id='opacity'>
@@ -227,12 +230,15 @@ var Creator =React.createClass({
 					</div>
 				</div>
 			<a id="op"></a>
-			<div id="textsyle">Add Text
-				<button onClick={this.addNewTextMeme} className="buttomtext" id="memetext">A</button>
-				<button onClick={this.addNewTextStandar} className="buttomtext" id="standard">A</button>
-				
-				
-				<button onClick={this.editimage} className="buttomtext" id="share">E</button>
+			<div id="textsyle"><span>style text</span>
+				<button onClick={this.addNewTextMeme} className="buttontext bt" id="memetext">A</button>
+				<button onClick={this.addNewTextStandar} className="buttontext bt" id="standard">A</button>
+				<button onClick={this.editimage} className="buttontext bt" id="share">E</button>
+				<span>Color text</span>
+				<button onClick={this.addColorText} className="coltex bt" id="cl1">Black</button>
+				<button onClick={this.addColorText} className="coltex bt" id="cl2">Blue</button>
+				<button onClick={this.addColorText} className="coltex bt" id="cl3">Red</button>
+				<button onClick={this.addColorText} className="coltex bt" id="cl4">yellow</button>
 			</div>
 			<div id="make" >
 			<div id="imagelist">
