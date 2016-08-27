@@ -226,16 +226,21 @@ container of text style
 .text{
 	text-transform: uppercase;
 	display: block;
-	padding: 5px;
+	padding: 10px 5px 5px 5px;
 	position: absolute;
-	overflow: auto;
+	overflow: hidden;
+	-webkit-resize:both;
 	-moz-resize:both;
+	-o-resize:both;
+	-ms-resize:both;
 	resize:both;
 	text-align: center;
+	vertical-align: middle;
 	word-wrap: break-word;
 	z-index: 1;
 	/*proof*/
-	font: 60px Impact, 'Arial Black';
+	
+
 }
 .memetext{
 	font-weight: bold;

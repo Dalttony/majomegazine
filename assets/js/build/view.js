@@ -179,7 +179,8 @@ var Creator =React.createClass({
 			});	
   	},
   	addNewTextMeme:function(evt){	
-  		majo.observer.notify("newText", 1);
+  		var d = majo.observer.notify("newText", 1);
+  		
   	},
   	addColorText:function(evt){
   		majo.creator.setColorText(evt.target.id);

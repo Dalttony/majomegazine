@@ -30,7 +30,7 @@ majo.creator = majo.creator || {};
 	var ctxfinally;
 	var canvas;
 	var ctx; // Initial canvas
-
+	var down=false; //know when the user clicked 
 	var svgcanvas;
 
 	var i = 0;
@@ -88,7 +88,8 @@ majo.creator = majo.creator || {};
 		this.root = document.getElementById("contenttext");
 		this.ele = document.createElement("div");
 		var x,y;
-		var down=false; //know when the user clicked 
+		var maxword = 100;
+		var countword =0;
 		this.id=id;
 		var self = this;
 		var color={
@@ -112,11 +113,11 @@ majo.creator = majo.creator || {};
 		}
 		//square of the text meme
 		var square = {
-			minw:Math.floor(conf.cvw/2),
-			minh:font.size+10,
-			maxw:conf.cvw-90,
-			maxh:Math.floor(conf.cvh/2)-100,
-			minl:25
+			minw: Math.floor(conf.cvw/2),
+			minh: font.size+10,
+			maxw: conf.cvw-90,
+			maxh: Math.floor(conf.cvh/2)-100,
+			minl: 25
 		};
 		this.setCurrent = function(){
 			current = true;
@@ -147,7 +148,7 @@ majo.creator = majo.creator || {};
 		};
 		//when the div lost the focus, remove the object if it doesn't have contents
 		this.onfocusout = function(evt){
-
+			
 			if(evt.target.textContent.trim().length==0){
 				var len = textsource.length;
 				i=0
@@ -155,15 +156,14 @@ majo.creator = majo.creator || {};
 					var strid = evt.target.id.split("-")[1];
 
 					if(self.id==parseInt(strid)){
-						console.log(i,strid);
 						textsource.splice(i,1);
 						self.root.removeChild(evt.target);
 						break;
 					}
 				}
 			}else{
-				self.str=evt.target.textContent.trim();
-				self.str=self.str.toUpperCase();
+				self.str = evt.target.textContent.trim();
+				self.str = self.str.toUpperCase();
 				evt.target.style.overflow = "hidden";
 				evt.target.removeAttribute("contentEditable");
 				evt.target.className ="text "+self.getClass();
@@ -178,9 +178,9 @@ majo.creator = majo.creator || {};
 		};
 		
 		this.onMouseMove = function(evt){
-			
 			//console.log(evt.offsetHeight+"-h w-"+evt.offsetWidth);
 			if(down){
+
 				if((currenttext.getPos().x > 0  &&  currenttext.getPos().x + evt.target.offsetWidth <= conf.cvw ) && (currenttext.getPos().y > 0  &&  currenttext.getPos().y + evt.target.offsetHeight <= conf.cvh)){
 					
 						x = currenttext.getPos().x;
@@ -199,24 +199,29 @@ majo.creator = majo.creator || {};
 		this.onMouseDown = function(evt){
 			
 //			evt.target.className ="text "+self.getClass();
-			
-			evt.target.setAttribute("contentEditable","false");
-			evt.target.removeAttribute("resize");
 			//establishing the current text
 			self.setCurrenttext(evt.target.id.split("-")[1]);
-			//calculate distance of mouse position event and text bound 
-			this.disxw =  evt.target.offsetWidth - evt.offsetX;
-			this.disyh = evt.target.offsetHeight - evt.offsetY;
-			
-			this.disxw = evt.target.offsetWidth -  this.disxw;
-			this.disyh = evt.target.offsetHeight -  this.disyh;
-			
-			this.parentx = evt.clientX - evt.target.offsetLeft - evt.offsetX ;
-			this.parenty = evt.clientY - evt.target.offsetTop - evt.offsetY;
-			
-			evt.target.style.cursor ="move";
+			if(currenttext){
+
+				evt.target.setAttribute("contentEditable","false");
+				evt.target.removeAttribute("resize");
+				//calculate distance of mouse position event and text bound 
+				this.disxw =  evt.target.offsetWidth - evt.offsetX;
+				this.disyh = evt.target.offsetHeight - evt.offsetY;
+				
+				this.disxw = evt.target.offsetWidth -  this.disxw;
+				this.disyh = evt.target.offsetHeight -  this.disyh;
+				
+				this.parentx = evt.clientX - evt.target.offsetLeft - evt.offsetX ;
+				this.parenty = evt.clientY - evt.target.offsetTop - evt.offsetY;
+				
+				evt.target.style.cursor ="move";
+			}else{
+				down=false;
+			}
 		};
 		this.onMouseUp = function(evt){
+			
 			down = false;
 			evt.target.className +=" active";
 			evt.target.setAttribute("contentEditable","true");
@@ -228,16 +233,26 @@ majo.creator = majo.creator || {};
 		this.onClick = function(evt){
 			
 		};
+
+		this.onResize = function(evt){
+			countword++;
+			if(maxword < countword) return false;
+			if( square.minh * 2 < evt.target.offsetHeight){
+				font.size = font.size * 0.9;
+				evt.target.style.fontSize= font.size + "px";
+
+			}
+			console.log(countword);
+		};
+
 		this.onMouseEnter = function(evt){
 			evt.target.className +=" active";
 		};
 		this.onMouseLeave = function(evt){
-			down = false;
 			evt.target.className ="text "+self.getClass();
 		};
 
 		this.setCurrenttext = function(id){
-			
 			var len = textsource.length;
 			if( len > 0)
 			{	
@@ -246,21 +261,19 @@ majo.creator = majo.creator || {};
 					//if((x > textsource[i].getPos().x && x < (textsource[i].getPos().x+textsource[i].getPos().w)) && (y > textsource[i].getPos().y && y < (textsource[i].getPos().y + textsource[i].getPos().h))){
 					if(id == textsource[i].id){
 						if(currenttext === textsource[i]){
-							down = true;
-							return currenttext;
 						}
 						else{
-							currenttext = textsource[i];
-							return currenttext;
+							currenttext = textsource[i];							
 						}
+						down = true;
+						return currenttext;
 					}
 				}
 			}
-			else
-			{
-				currentImage = null;
-				return null;
-			}
+			down = false;
+			currenttext = null;
+			return null;
+		
 		};
 		this.add();
 	}
@@ -360,13 +373,17 @@ majo.creator = majo.creator || {};
 			this.ele.style.color = this.getFont().color;
 			this.ele.style.minWidth="10px";
 			this.ele.width = conf.cvw+"px";
+			this.ele.style.fontFamily =  this.getFont().letter;
+			this.ele.style.fontSize = this.getFont().size + "px";// Impact, 'Arial Black';
+			this.ele.style.lineHeight = "1"
 			this.ele.style.minHeight=this.getSquare().minh+"px";
 			this.ele.style.maxHeight=this.getSquare().maxh+"px";
 			this.ele.style.maxWidth=this.getSquare().maxw+"px";
 			//this.ele.style.lineHeight="55px"//size letter
 			if(textsource.length==1){
-				this.getPos().y= conf.cvh-this.getSquare().minh-20;
+				this.getPos().y= conf.cvh-this.getSquare().minh-100;
 			}
+			//place of text when it has more than 3
 			if(textsource.length>2){
 				this.getPos().x = Math.floor(Math.random() * (conf.cvw - 100 + 1)) + 100;
 				this.getPos().y = Math.floor(Math.random() * (conf.cvh - 100 + 1)) + 100;
@@ -382,7 +399,7 @@ majo.creator = majo.creator || {};
 			this.root.onmousedown = this.onMouseDown;
 //			this.root.onmousemove = this.onMouseDown;
 			//this.ele.ondblclick = this.onMousedbClick;
-			this.ele.onresize = this.onResize;
+			this.ele.onkeypress = this.onResize;
 			this.ele.focus();
 		},
 		draw : function(id){
