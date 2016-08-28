@@ -67,6 +67,7 @@ majo.creator = majo.creator || {};
 		canvas.addEventListener("drop",this.handler.drop);
 		canvas.addEventListener("dragover",this.handler.dragover);
 		canvas.addEventListener("dragleave",this.handler.dragleave);
+		window.addEventListener('paste',this.handler.paste,false);
 		//canvas.addEventListener("drop",dropImage,true);
 		//canvas.addEventListener("dragover",overImage,true);
 		ctx = canvas.getContext("2d");
@@ -103,7 +104,8 @@ majo.creator = majo.creator || {};
 		var font={
 			size: 60,
 			color: "rgb(255,255,255)",
-			letter: "Impact, Arial Black"
+			letter: "Impact, Arial Black",
+			weight: "normal",
 		};
 		var pos={
 			x:10,
@@ -240,9 +242,7 @@ majo.creator = majo.creator || {};
 			if( square.minh * 2 < evt.target.offsetHeight){
 				font.size = font.size * 0.9;
 				evt.target.style.fontSize= font.size + "px";
-
 			}
-			console.log(countword);
 		};
 
 		this.onMouseEnter = function(evt){
@@ -367,6 +367,7 @@ majo.creator = majo.creator || {};
 		},
 		add : function(){
 			this.ele.className = "text active "+this.getClass();
+
 			this.ele.id="text-"+this.id;
 			this.ele.setAttribute("contentEditable","true");
 			this.ele.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
@@ -376,6 +377,7 @@ majo.creator = majo.creator || {};
 			this.ele.style.fontFamily =  this.getFont().letter;
 			this.ele.style.fontSize = this.getFont().size + "px";// Impact, 'Arial Black';
 			this.ele.style.lineHeight = "1"
+			this.ele.style.fontWeight = this.getFont().weight;
 			this.ele.style.minHeight=this.getSquare().minh+"px";
 			this.ele.style.maxHeight=this.getSquare().maxh+"px";
 			this.ele.style.maxWidth=this.getSquare().maxw+"px";
@@ -393,7 +395,6 @@ majo.creator = majo.creator || {};
 			this.root.appendChild(this.ele);
 			this.ele.onblur = this.onfocusout;
 			this.ele.onclick = this.onClick;
-			
 			this.root.addEventListener("mousemove", this.onMouseMove);
 			this.ele.onmouseup = this.onMouseUp;
 			this.root.onmousedown = this.onMouseDown;
@@ -439,9 +440,13 @@ majo.creator = majo.creator || {};
 			 // self.root.removeChild(self.ele);
 			}
 		},
-		setColorText : function(color){
+		setColor : function(color){
 			this.getFont()['color'] = color;
 			this.ele.style.color = colortext[color];
+		},
+		setSize : function(size){
+			this.getFont()['size'] = parseInt(size);
+			this.ele.style.fontSize = size +"px";
 		}
 	};
 
@@ -472,11 +477,11 @@ majo.creator = majo.creator || {};
 			"text-align: center;",
 			"word-wrap: break-word;",
 			"z-index: 1;",
-			"font:"+this.getFont().size+"px Impact, Arial Black;",
+			"font:"+this.getFont().size+"px Impact, 'Arial Black';",
 			"font-weight: bold;",
 			"color:"+this.getFont().color+";",
 			"-webkit-text-fill-color: white;",
-			"-webkit-text-stroke-width: 3px;",
+			"-webkit-text-stroke-width: 2px;",
    			"-webkit-text-stroke-color: black;",
    			"text-stroke-width: 1px;",		
    			"text-stroke-color: black;",
@@ -494,9 +499,8 @@ majo.creator = majo.creator || {};
 	
 
 	var TextStandard = function(id){
-		this.rotate = function(ang){
- 
-		};
+
+		
 		this.getClass = function(){
 			return "standard";
 		};
@@ -1535,12 +1539,19 @@ majo.creator = majo.creator || {};
 
 	this.setColorText = function(color){
 		if(currenttext){
-			currenttext.setColorText(color);
+			currenttext.setColor(color);
 		}else{
 			console.log("There isn't current Text");
 		}
 	};
 	
+	this.setSizeText = function(size){
+		if(currenttext){
+			currenttext.setSize(size);
+		}else{
+			console.log("There isn't current Text");
+		}
+	}
 //**--------------- Finish event interact
 	this.getCurrent = function(){
 		return currentImage;
@@ -1601,6 +1612,7 @@ majo.creator = majo.creator || {};
 		  		}
 	  	},
 	  	mousemove:function(evt){
+	  		
 	  		var target = evt.target;
 	  		if(currentImage){
 		  		var x = evt.offsetX;
@@ -1735,6 +1747,33 @@ majo.creator = majo.creator || {};
 	  	},
 	  	dragleave:function(evt){
 	  		evt.target.style.cursor='not-allowed'
+	  		evt.preventDefault();
+	  	},
+	  	paste:function(evt){
+	  		document.onmouseenter = function(evt){
+	  			console.log("enter");
+	  		};
+	  		document.onblur = function(evt){
+	  			console.log("focus");
+	  		};
+	  		
+	  		var clipboard = evt.clipboardData || window.clipboardData || evt.originalEvent.clipboardData;
+	  		 	var reader = new FileReader();
+	  		clipboard.types.forEach(function(ele,i){
+	  			if(clipboard.items[i].type.match(/image.*/)){
+	  				reader.readAsDataURL(clipboard.items[i].getAsFile());
+	  			}
+	  		});
+
+	  		reader.onload = function(evt){
+	  			var imgdata = {
+								id: self.getImageLength(),
+					        	src: evt.target.result,
+					        	tmpsrc: evt.target.result,
+					        	alt: "",
+					        };
+						self.newImagenfactory(imgdata)
+	  		}
 	  		evt.preventDefault();
 	  	},
 	  	shareMeme:function(data){

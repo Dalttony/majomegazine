@@ -180,13 +180,16 @@ var Creator =React.createClass({
   	},
   	addNewTextMeme:function(evt){	
   		var d = majo.observer.notify("newText", 1);
-  		
+
   	},
   	addColorText:function(evt){
   		majo.creator.setColorText(evt.target.id);
   	},
   	addNewTextStandar:function(evt){
   		majo.observer.notify("newText", 2);
+  	},
+  	changeSize:function(evt){
+  		majo.creator.setSizeText(evt.target.id.split('-')[1]);
   	},
   	limitedText: function(){
 
@@ -234,12 +237,15 @@ var Creator =React.createClass({
 			<div id="textsyle"><span>style text</span>
 				<button onClick={this.addNewTextMeme} className="buttontext bt" id="memetext">A</button>
 				<button onClick={this.addNewTextStandar} className="buttontext bt" id="standard">A</button>
-				<button onClick={this.editimage} className="buttontext bt" id="share">E</button>
 				<span>Color text</span>
 				<button onClick={this.addColorText} className="coltex bt" id="cl1">Black</button>
 				<button onClick={this.addColorText} className="coltex bt" id="cl2">Blue</button>
 				<button onClick={this.addColorText} className="coltex bt" id="cl3">Red</button>
 				<button onClick={this.addColorText} className="coltex bt" id="cl4">yellow</button>
+				<span>Letter Size</span>
+				<button onClick={this.changeSize} className="sizetex bt" id="sz-60">G</button>
+				<button onClick={this.changeSize} className="sizetex bt" id="sz-40">M</button>
+				<button onClick={this.changeSize} className="sizetex bt" id="sz-20">P</button>
 			</div>
 			<div id="make" >
 			<div id="imagelist">

@@ -235,6 +235,9 @@ var majo = majo || {};
 		addNewTextStandar: function (evt) {
 			majo.observer.notify("newText", 2);
 		},
+		changeSize: function (evt) {
+			majo.creator.setSizeText(evt.target.id.split('-')[1]);
+		},
 		limitedText: function () {},
 		sharedSucces: function (data) {},
 		createdsucces: function (data) {
@@ -307,11 +310,6 @@ var majo = majo || {};
 							"A"
 						),
 						React.createElement(
-							"button",
-							{ onClick: this.editimage, className: "buttontext bt", id: "share" },
-							"E"
-						),
-						React.createElement(
 							"span",
 							null,
 							"Color text"
@@ -335,6 +333,26 @@ var majo = majo || {};
 							"button",
 							{ onClick: this.addColorText, className: "coltex bt", id: "cl4" },
 							"yellow"
+						),
+						React.createElement(
+							"span",
+							null,
+							"Letter Size"
+						),
+						React.createElement(
+							"button",
+							{ onClick: this.changeSize, className: "sizetex bt", id: "sz-60" },
+							"G"
+						),
+						React.createElement(
+							"button",
+							{ onClick: this.changeSize, className: "sizetex bt", id: "sz-40" },
+							"M"
+						),
+						React.createElement(
+							"button",
+							{ onClick: this.changeSize, className: "sizetex bt", id: "sz-20" },
+							"P"
 						)
 					),
 					React.createElement(

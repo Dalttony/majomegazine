@@ -147,17 +147,28 @@ container of text style
 /*Text style*/
 .bt{
 	/*General style for the button */
-	position: relative;
+	
 	border: none;
-	margin-top: 2px;
-	 text-decoration: none;
-	 text-align: center;
+	
+	 
 	 box-sizing: border-box;
 	 -webkit-box-sizing: border-box;
 	-o-box-sizing: border-box;
 	 -ms-box-sizing: border-box;
+	 text-align: center;
+	 margin-top: 2px;
+	 position: relative;
 }
 .coltex{
+	width: 50px;
+	height: 50px;
+	border-radius: 100%;
+	-webkit-border-radius: 100%;
+	-moz-border-radius: 100%;
+	-o-border-radius: 100%;
+	-ms-border-radius: 100%;
+}
+.sizetex{
 	width: 50px;
 	height: 50px;
 	border-radius: 100%;
@@ -198,10 +209,9 @@ container of text style
 	line-Height:0px;
 }
 #memetext{
-	font-weight: bold;
 	color: white;
 	-webkit-text-fill-color: white;
-	-webkit-text-stroke-width: 3px;
+	-webkit-text-stroke-width: 2px;
    	-webkit-text-stroke-color: black;
    	text-stroke-width: 1px;																				
    	text-stroke-color: black;
@@ -215,9 +225,6 @@ container of text style
 	margin-left: 5px;
 	width: 100px;
 	height: 30px;
-}
-.standard{
-	color: white;
 }
 #textsyle{
 	width:54px;
