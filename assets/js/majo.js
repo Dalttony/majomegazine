@@ -1718,6 +1718,31 @@ majo.creator = majo.creator || {};
 						i++;
 					}
 			}else{
+
+
+				/*evt.dataTransfer.items.forEach(function(ele,i){
+					console.log(ele);
+					console.log(i);
+				});*/
+				//ONLY WORK WITH CHROME
+					if(evt.dataTransfer["items"]){
+						var datas = evt.dataTransfer.items;
+						for(var i=0; i< datas.length;i++){
+							
+							if(datas[i].type.match('^text/html')){
+								datas[i].getAsString(function(e){
+									var parser = new DOMParser();
+									var doc = parser.parseFromString(e, "text/html");
+									var img = doc.getElementsByTagName('img');
+									if(img.length > 0){
+										//before verify the image size 
+										console.log(img[0]);
+									}
+								});
+							}
+						}	
+					}
+
 				if(evt.dataTransfer.getData("text")){
 					var strimage = evt.dataTransfer.getData("text");
 					//veryfy if the source type if jgp or png
@@ -1750,8 +1775,10 @@ majo.creator = majo.creator || {};
 	  		evt.preventDefault();
 	  	},
 	  	paste:function(evt){
+	  		var imgPreviewFragment = document.createDocumentFragment();//this part for loading imagen
 	  		document.onmouseenter = function(evt){
-	  			console.log("enter");
+	  			var clipboard = window.clipboardData;
+	  			console.log(window.clipboardData.getData('Text'));
 	  		};
 	  		document.onblur = function(evt){
 	  			console.log("focus");
