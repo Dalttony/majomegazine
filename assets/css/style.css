@@ -21,18 +21,33 @@ li{
 	width: auto;
 }
 #make {
-	width: 700px;
+	
 	margin: 0 10px 0 0;
 	position: relative;
+	width: 700px;
 }
-
+#layout > ul{
+	position: relative;
+	overflow: auto;
+	width: 100%;
+}
 #layout > ul >li{
-	display: inline-block;
+	border: 2px solid red;
+	box-sizing: border-box;
+	-webkit-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	display: inline-table;
+	height: 60px;
+	padding: 2px;
+	position: relative;
 	text-decoration: none;
 	text-align: center;
-	border: 2px solid red;
-	width: 10%;
-
+	width: 60px;
+}
+#layout > ul > li:nth-child(n+9){
+	display: none;
 }
 #search{
 	border: 1px solid black;
@@ -147,10 +162,7 @@ container of text style
 /*Text style*/
 .bt{
 	/*General style for the button */
-	
 	border: none;
-	
-	 
 	 box-sizing: border-box;
 	 -webkit-box-sizing: border-box;
 	-o-box-sizing: border-box;
@@ -356,26 +368,33 @@ Style for the contenxt of header and footer
 	border: 2px dotted black !important;
 	position: relative;
 }
-#searchBycategory{
+/*Searche style*/
+.srch{
 	
 	word-wrap: break-word;
 }
-#searchBycategory p{
+.srch p{
 	margin: 0 auto;
 
 }
-#searchBycategory > span{
+.srch > span{
 	text-align: center;
 	display: inline-block; 
-	margin: 2px 4px 2px 2px ;
-	padding: 2px 5px;
+	margin: 2px 4px 2px 2px;
+	padding: 3px 5px;
 	border-radius: 20px;
 	-woz-border-radius: 20px;
 	-webkit-border-radius: 20px;
 	-ms-border-radius: 20px;
 	color: white;
-	background-color: blue;
+	
 	cursor: pointer;
+}
+#din-mic > span{
+	background-color: blue;
+}
+#sta-ic > span{
+	background-color: blue;
 }
 /*
  * SimpleModal Confirm Modal Dialog

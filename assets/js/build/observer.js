@@ -46,6 +46,7 @@ var majo = majo || {};
 		var newdata = self.creator.newImagen(data);	
 	};
 	subject.removeImagen = function(data){
+		
 		var remove = self.creator.deleteImage(data.id);
 		(remove.state)&&self.observer.receiveNotify("removeImagen", remove.id);
 	}
@@ -56,7 +57,10 @@ var majo = majo || {};
 	};
 	subject.Search = function(data){
 		//call to model 
-		self.model.getDataImage(data.strsearch,"Search");
+		 self.model.getDataImage(data, "Search");
+		//if(data.strsearch)
+		//else 
+		//	if(data.staticfile) self.model.getDataStaticImage(data, "Search");
 	};
 	subject.createdMeme = function(){
 		//console.log("Hola");

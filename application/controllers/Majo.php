@@ -53,42 +53,64 @@ class Majo extends CI_Controller{
 
 	}
 
-	public function getImage($str){
+	public function getImage($str,$type=0){
+		
 		$rimg = array();
-		if(strlen($str)<3){
-			array_push($rimg,array('err' => True));
+		/*if(strlen($str) < 3 ){
+			array_push($rimg, array('err' => True));
 		}
-		else{
+		else{*/
 			if($this->input->is_ajax_request())
 			{
-				$str = (explode(" ",trim($str))>0)?str_replace(" ","+",$str):" ";
-				$file_contents = file_get_contents("https://images.search.yahoo.com/search/images;_ylt=AwrBTvgXkOdV1pkAzL3z6Qt.;_ylu=X3oDMTE2OWtwcnU0BGNvbG8DYmYxBHBvcwMxBHZ0aWQDQUNCWUJSMV8xBHNlYwNwaXZz?p=".$str."&fr=sfp&fr2=piv-web");
-				$pq = $this->phpquery->newDocumentHTML($file_contents,'utf-8');
-				
-				//parse  tag only for image
-				$i=0;
-				$scpast ="";
-				foreach ($pq->find('img') as $img)
-				{
-					if(pq($img)->attr('src')!=null && $i>0){
-				//	$type = get_mime_by_extension(pq($img)->attr('src'));
-					/*$imgData = base64_encode(file_get_contents(pq($img)->attr('src')));
-					$src = "data:image/jpeg;base64,".$imgData;*/
+				if($type == 0){
+					$str = (explode(" ",trim($str))>0) ? str_replace(" ","+",$str):" ";
+					$file_contents = file_get_contents("https://images.search.yahoo.com/search/images;_ylt=AwrBTvgXkOdV1pkAzL3z6Qt.;_ylu=X3oDMTE2OWtwcnU0BGNvbG8DYmYxBHBvcwMxBHZ0aWQDQUNCWUJSMV8xBHNlYwNwaXZz?p=".$str."&fr=sfp&fr2=piv-web");
+					$pq = $this->phpquery->newDocumentHTML($file_contents,'utf-8');
 					
-						if($scpast != pq($img)->attr('src')){
-							array_push($rimg,array( "id" =>$i,
-													"source" => pq($img)->attr('src'),
-												   "alt" => $str)
-										);
-							$scpast = pq($img)->attr('src');
+					//parse  tag only for image
+					$i=0;
+					$scpast ="";
+					foreach ($pq->find('img') as $img)
+					{
+						if(pq($img)->attr('src')!=null && $i>0){
+					//	$type = get_mime_by_extension(pq($img)->attr('src'));
+						/*$imgData = base64_encode(file_get_contents(pq($img)->attr('src')));
+						$src = "data:image/jpeg;base64,".$imgData;*/
+						
+							if($scpast != pq($img)->attr('src')){
+								array_push($rimg,array( "id" =>$i,
+														"source" => pq($img)->attr('src'),
+													   "alt" => $str)
+											);
+								$scpast = pq($img)->attr('src');
+							}
 						}
+						$i++;
+					  
 					}
-					$i++;
-				  
 				}
-				 echo json_encode($rimg);
+				else{
+					
+				 	if($type == 1){
+				 		$pathstatic = "sticker";
+				 	}else{
+						$pathstatic ="background";
+				 	}
+				 	$files = get_dir_file_info("assets/img/".$pathstatic);
+				 	$i=0;
+				 	foreach ($files as $key => $value) {
+				 		
+				 		array_push($rimg,array( "id" => $i,
+														"source" => base_url($value["relative_path"])."/".$key,
+													   "alt" => $str)
+						
+											);
+				 		$i++;
+				 	}
+				}
+				echo json_encode($rimg);
 			}
-		}
+		/*}*/
 	}
 
 	public function putImage($data){

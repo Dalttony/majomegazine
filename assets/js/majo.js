@@ -20,6 +20,8 @@ majo.creator = majo.creator || {};
 		cl3: "#FFFF00",
 		cl4: "#008000"
 	};
+	
+
 	var self = this;
 	var sizsquad=10;
 	var cr = document.createElement("canvas");
@@ -90,19 +92,19 @@ majo.creator = majo.creator || {};
 		this.ele = document.createElement("div");
 		var x,y;
 		var maxword = 100;
-		var countword =0;
-		this.id=id;
+		var countword = 0;
+		this.id = id;
 		var self = this;
-		var color={
-			white:"rgb(255,255,255)", //white
-			black:"rgb(0,0,0)",
-			fillStyle:true,
-			strokeStyle:false,
-			shadowStyle:false,
-			current:"rgb(0,0,0)"
+		var color = {
+			white: "rgb(255,255,255)", //white
+			black: "rgb(0,0,0)",
+			fillStyle: true,
+			strokeStyle: false,
+			shadowStyle: false,
+			current: "rgb(0,0,0)"
 		};
 		var font={
-			size: 60,
+			size: 50,
 			color: "rgb(255,255,255)",
 			letter: "Impact, Arial Black",
 			weight: "normal",
@@ -127,13 +129,16 @@ majo.creator = majo.creator || {};
 		
 		this.getSquare= function(){
 			return square;
-		}
+		};
+
 		this.getPos = function(){
 			return pos;
 		};
+
 		this.getLines = function(){
 			return lines;
-		}
+		};
+
 		this.getFont = function(){
 			return font;
 		};
@@ -141,10 +146,12 @@ majo.creator = majo.creator || {};
 		this.drawTextMeme = function(){
 			ctx.save();
 			this.draw();
-		}
+		};
+
 		this.getColor = function(){
 			return color;
 		};
+
 		this.getThis = function(){
 			return this;
 		};
@@ -182,9 +189,7 @@ majo.creator = majo.creator || {};
 		this.onMouseMove = function(evt){
 			//console.log(evt.offsetHeight+"-h w-"+evt.offsetWidth);
 			if(down){
-
 				if((currenttext.getPos().x > 0  &&  currenttext.getPos().x + evt.target.offsetWidth <= conf.cvw ) && (currenttext.getPos().y > 0  &&  currenttext.getPos().y + evt.target.offsetHeight <= conf.cvh)){
-					
 						x = currenttext.getPos().x;
 						y = currenttext.getPos().y
 						currenttext.getPos().x = evt.clientX - this.parentx - this.disxw;
@@ -229,20 +234,22 @@ majo.creator = majo.creator || {};
 			evt.target.setAttribute("contentEditable","true");
 			evt.target.style.cursor ="auto";
 			evt.target.focus();
-			
-			//currenttext= null;
+
 		};
+
 		this.onClick = function(evt){
 			
 		};
 
 		this.onResize = function(evt){
+
 			countword++;
 			if(maxword < countword) return false;
 			if( square.minh * 2 < evt.target.offsetHeight){
 				font.size = font.size * 0.9;
 				evt.target.style.fontSize= font.size + "px";
 			}
+
 		};
 
 		this.onMouseEnter = function(evt){
@@ -313,11 +320,12 @@ majo.creator = majo.creator || {};
 					//the diference between the text and general canvas
 				var diff = w - conf.cvw;
 				var font = this.getFont(); 
+
 				//var newsize = ((diff*100)/this.getFont().size)/100;
 				var newsize = this.getFont().size/diff;
 				this.getFont().size = newsize;	
+
 				}
-				
 			}
 		},
 		drawCurrent:function(){
@@ -866,13 +874,14 @@ majo.creator = majo.creator || {};
 		}
 	}
 	//draw the background image, to extend of image meme
-	var ImagenGrounder = function(){
-		ImagenMeme.apply(this);
+	var ImagenGround = function(){
+		
 		this.draw = function(){
 			ctx.drawImage(this.getImage(),0,0,conf.cvw,conf.cvh);	
 		}
+		ImagenMeme.apply(this);
 	}
-	ImagenGrounder.prototype = Object.create(ImagenMeme.prototype);
+	ImagenGround.prototype = Object.create(ImagenMeme.prototype);
 
 //section for to enable or to disable text and image
 	
@@ -892,27 +901,40 @@ majo.creator = majo.creator || {};
 		return (imagenSorce.length <= conf.maximg) ? true:false;
 	};
 	this.newImagenfactory = function(data){
-
-		//id = imagenSorce.length
-		var img = new ImagenMeme(data.id)
-		img.setSource(data.src);
-		img.tempimage(data.tmpsrc);
-		imagenSorce.push(img);
-		selectGrid()
-		var minimg = [{
-					id: data.id,
-					src: data.src,
-					tmpsrc: data.tmpsrc,
-					alt: data.alt
-				}];
-		majo.observer.receiveNotify("newImagen", minimg);
-	}
-
+		
+		if(imagenSorce.length <= conf.maximg){
+			//id = imagenSorce.length
+			var img = new ImagenMeme(data.id)
+			img.setSource(data.src);
+			img.tempimage(data.tmpsrc);
+			imagenSorce.push(img);
+			selectGrid(imagenSorce.length)
+			var minimg = [{
+						id: data.id,
+						src: data.src,
+						tmpsrc: data.tmpsrc,
+						alt: data.alt
+					}];
+					majo.observer.receiveNotify("newImagen", minimg);
+			//this.setStyleGrid(imagenSorce.length);
+			
+			}
+		else{
+			majo.observer.receiveNotify("newImagen", {created: false,
+													  execedImage: true
+														});
+		}
+	};
+	
+	this.newImageBackGround = function(){
+			var img = new ImagenMeme(data.id);
+	};
+	//depending of type image, url or file.
 	this.newImagen = function(data){
 
 		//if imagen quantity is less than the quantity there are into canvas
-		var returned ={};
-		if(imagenSorce.length <= conf.maximg){
+		
+		
 
 			var self = this;
         	
@@ -926,7 +948,6 @@ majo.creator = majo.creator || {};
     		imgtemp.crossOrigin ="Anonymous";
 			
     		imgtemp.onload = function(){
-
                 crx.drawImage(imgtemp, 0, 0, conf.cvw, conf.cvh);
                 var src = cr.toDataURL();
 				var minimg = {
@@ -938,12 +959,7 @@ majo.creator = majo.creator || {};
 				self.newImagenfactory(minimg)
             }
             imgtemp.src = data.src; 
-		}
-		else{
-			returned.created = false;
-			returned.execedImage = true;
-		}
-		return returned;
+		
 	}
 
 	this.create = function(){
@@ -964,41 +980,85 @@ majo.creator = majo.creator || {};
 
 		return canvas.toDataURL();*/
 	}
-	this.send = function(){
-		
-		
+	this.setStyleGrid = function(q,_q){
+		var q = parseInt(q);
+		if(q <=  imagenSorce.length){
+			selectGrid (q,_q);
+		}
 	};
 
 	//-----------------fin section
-	function selectGrid (){
+	function selectGrid (q,_q){
 		currentImage=false;
-		switch(imagenSorce.length){
+		var _q = _q || 1;
+		switch(q){
 			case 1: 
-				simpleSquare();
+				if(simpleSquare.hasOwnProperty("gs"+q+_q)){
+						simpleSquare["gs"+q+_q]()
+					}else{
+						simpleSquare["gs11"]()
+					}
 				break;
 			case 2: 
-				doubleSquare.doubleVsquare();
+				if(doubleSquare.hasOwnProperty("gs"+q+_q)){
+					doubleSquare["gs"+q+_q]()
+				}else{
+						doubleSquare["gs21"]()
+				}
+				//doubleSquare.oubleVsquare();
 				break;
 			case 3: 
-				tripleSquare.tripleonetwoHsquare();
+				if(tripleSquare.hasOwnProperty("gs"+q+_q)){
+						tripleSquare["gs"+q+_q]()
+					}else{
+						fiveSquare["gs31"]()
+					}
+				
 				break;
 			case 4:
-				fourSquare.four3x1Hsquare();
+				if(fourSquare.hasOwnProperty("gs"+q+_q)){
+						fourSquare["gs"+q+_q]()
+					}else{
+						fourSquare["gs41"]()
+					}
+				
 				break;
 			case 5:
-				fiveSquare.five1_2_2Hsquare();
+				if(fiveSquare.hasOwnProperty("gs"+q+_q)){
+						fiveSquare["gs"+q+_q]()
+					}else{
+						fiveSquare["gs51"]()
+					}
+				
 				break;
 			case 6:
-				sixSquare.six3x2square();
+				if(sixSquare.hasOwnProperty("gs"+q+_q)){
+						sixSquare["gs"+q+_q]()
+					}else{
+						sixSquare["gs61"]()
+					}
+				
 				break;
 			case 7:
-				sevenSquare.seven2_3_2Wsquare();
+				if(sevenSquare.hasOwnProperty("gs"+q+_q)){
+						sevenSquare["gs"+q+_q]()
+					}else{
+						sevenSquare["gs71"]()
+					}
 				break;
 			case 8:
-				eightSquare.eight4x2square();
+				if(eightSquare.hasOwnProperty("gs"+q+_q)){
+						eightSquare["gs"+q+_q]()
+					}else{
+						eightSquare["gs81"]()
+					}
 				break;
 			case 9:
-				nineSquare.nine3x3square();
+				if(nineSquare.hasOwnProperty("gs"+q+_q)){
+						nineSquare["gs"+q+_q]()
+				}else{
+					nineSquare["gs91"]()
+				}
 				break;
 		}
 		render();
@@ -1013,7 +1073,7 @@ majo.creator = majo.creator || {};
 			if(imagenSorce[i].getId() == id){
 				var id= i;
 				imagenSorce.splice(i,1);
-				selectGrid();
+				selectGrid(imagenSorce.length);
 				return { state: true, id: id};
 			}
 		}
@@ -1066,10 +1126,6 @@ majo.creator = majo.creator || {};
 		ctx.rect(currentImage.x+currentImage.w-sizsquad,currentImage.y+middle,sizsquad,sizsquad);
 
 		ctx.stroke()
-
-
-		
-		//ctxcache.drawImage(ctx.canvas,0,0,conf.cvw,conf.cvh);
 	}
 	//-----------------------Finish rendering
 	
@@ -1097,16 +1153,22 @@ majo.creator = majo.creator || {};
 				xw:xw };
 	};
 
-	var simpleSquare = function(imgsource){
+	var simpleSquare = {
+		//simple one 
+		gs11: function(imgsource){
 		//Ruler
-		var dataimg = imgsource;
-		imagenSorce[0].setUp(ruler(0, 0, conf.cvw, conf.cvh));
-	};
-	var CenterSquare = function(){
+			var dataimg = imgsource;
+			imagenSorce[0].setUp(ruler(0, 0, conf.cvw, conf.cvh));
+		},
+		//simple one center
+		gs12: function(){
 			var simple = ruler(20,20,conf.height-20,conf.width-20);		
+		}
 	}
+	
 	var doubleSquare = {
-	 doubleVsquare:function(){
+		//doubleVsquare
+	 gs21:function(){
 		 	var simple = [];
 		 	var middle = Number.parseInt(conf.cvw/2);
 		 	simple.push(ruler(0,0,middle,conf.cvh));
@@ -1116,7 +1178,8 @@ majo.creator = majo.creator || {};
 					imagenSorce[i].setUp(simple[i]);
 			}
 	 },
-	 doubleHsquare:function(){
+	 //doubleHsquare
+	 gs22:function(){
 	 		var simple = [];
 		 	var middle = Number.parseInt(conf.cvh/2);
 		 	//console.log(ruler(0,0,conf.cvw,middle));
@@ -1133,7 +1196,8 @@ majo.creator = majo.creator || {};
 	
 	//
 	var tripleSquare = {
-		tripleVsquare:function(){
+		//tripleVsquare
+		gs31:function(){
 			var simple = [];
 		 	var triple = Number.parseInt(conf.cvw/3);
 		 	//Ruler
@@ -1145,7 +1209,8 @@ majo.creator = majo.creator || {};
 					imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		tripleonetwoVsquare:function(){
+		//tripleonetwoVsquare
+		gs32:function(){
 			var simple = [];
 			var dbl = Number.parseInt(conf.cvw/2)
 		 	var dblh = Number.parseInt(conf.cvh/2);
@@ -1158,7 +1223,8 @@ majo.creator = majo.creator || {};
 					imagenSorce[i].setUp(simple[i]);
 			}
 		},//two images on the right and one on the left
-		tripletwooneVsquare:function(){
+		//tripletwooneVsquare
+		gs33:function(){
 			var simple = [];
 			var dbl = Number.parseInt(conf.cvw/2)
 		 	var dblh = Number.parseInt(conf.cvh/2);
@@ -1171,7 +1237,8 @@ majo.creator = majo.creator || {};
 					imagenSorce[i].setUp(simple[i]);
 			}
 		},//two images on the left and one on the right
-		tripleHSquare:function(){
+		//tripleHSquare
+		gs34:function(){
 			var simple = [];
 		 	var triple = Number.parseInt(conf.cvh/3);
 		 	//Ruler
@@ -1183,7 +1250,8 @@ majo.creator = majo.creator || {};
 					imagenSorce[i].setUp(simple[i]);
 			}
 		}, //two images above and one below
-		tripleonetwoHsquare:function(){
+		//tripleonetwoHsquare
+		gs35:function(){
 			var simple = [];
 			var dbl = Number.parseInt(conf.cvw/2);//widht of img
 		 	var dblh = Number.parseInt(conf.cvh/2);//height of img
@@ -1197,7 +1265,8 @@ majo.creator = majo.creator || {};
 					imagenSorce[i].setUp(simple[i]);
 			}
 		},//two images below and one above
-		tripletwooneHsquare:function(){
+		//tripletwooneHsquare
+		gs36:function(){
 			var simple = [];
 			var dbl = Number.parseInt(conf.cvw/2) //divido la imgaen en ancho
 		 	var dblh = Number.parseInt(conf.cvh/2); //divido la imagen en alto
@@ -1213,7 +1282,8 @@ majo.creator = majo.creator || {};
 	};
 	//
 	var fourSquare={
-		fourHsquare: function () {
+		//fourHsquare
+		gs41: function () {
 			var simple = [];
 			var four = Number.parseInt(conf.cvh / 4);
 			//Ruler
@@ -1226,7 +1296,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		fourVsquare: function(){
+		//fourVsquare
+		gs42: function(){
 			var simple = [];
 			var four = Number.parseInt(conf.cvw / 4);
 			//Ruler
@@ -1239,7 +1310,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		four2x2square: function(){
+		//four2x2square
+		gs43: function(){
 			var simple = [];
 			var middleW = Number.parseInt(conf.cvw / 2);
 			var middleH = Number.parseInt(conf.cvh / 2);
@@ -1253,7 +1325,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		four1x3Hsquare: function(){
+		//four1x3Hsquare
+		gs44: function(){
 			var simple = [];
 			var tripleW = Number.parseInt(conf.cvw / 3);
 			var middleH = Number.parseInt(conf.cvh / 2);
@@ -1267,7 +1340,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		four3x1Hsquare: function(){
+		//four3x1Hsquare
+		gs44: function(){
 			var simple = [];
 			var tripleW = Number.parseInt(conf.cvw / 3);
 			var middleH = Number.parseInt(conf.cvh / 2);
@@ -1283,7 +1357,8 @@ majo.creator = majo.creator || {};
 		}
 	};
 	var fiveSquare={
-		fiveHsquare: function () {
+		//fiveHsquare
+		gs51: function () {
 			var simple = [];
 			var five = Number.parseInt(conf.cvh / 5);
 			//Ruler
@@ -1297,7 +1372,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		fiveVsquare: function(){
+		//fiveVsquare
+		gs52: function(){
 			var simple = [];
 			var five = Number.parseInt(conf.cvw / 5);
 			//Ruler
@@ -1311,7 +1387,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		five2_3Hsquare: function(){
+		//five2_3Hsquare
+		gs53: function(){
 			var simple = [];
 			var middleW = Number.parseInt(conf.cvw / 2);
 			var middleH = Number.parseInt(conf.cvh / 2);
@@ -1327,7 +1404,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		five3_2Hquare: function(){
+		//five3_2Hquare
+		gs54: function(){
 			var simple = [];
 			var middleW = Number.parseInt(conf.cvw / 2);
 			var middleH = Number.parseInt(conf.cvh / 2);
@@ -1343,7 +1421,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		five1_2_2Hsquare: function(){
+		//five1_2_2Hsquare
+		gs55: function(){
 			var simple = [];
 			var middleW = Number.parseInt(conf.cvw / 2);
 			var tripleH = Number.parseInt(conf.cvh / 3);
@@ -1360,7 +1439,8 @@ majo.creator = majo.creator || {};
 		}
 	};
 	var sixSquare={
-		six2x3square: function () {
+		//six2x3square
+		gs61: function () {
 			var simple = [];
 			var middleH = Number.parseInt(conf.cvh / 2);
 			var tripleW = Number.parseInt(conf.cvw / 3);
@@ -1376,7 +1456,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		six3x2square: function(){
+		//six3x2square
+		gs62: function(){
 			var simple = [];
 			var tripleH = Number.parseInt(conf.cvh / 3);
 			var middleW = Number.parseInt(conf.cvw / 2);
@@ -1394,7 +1475,8 @@ majo.creator = majo.creator || {};
 		}
 	};
 	var sevenSquare={
-		seven3_4Wsquare: function () {
+		//seven3_4Wsquare
+		gs71: function () {
 			var simple = [];
 			var middleH = Number.parseInt(conf.cvh / 2);
 			var tripleW = Number.parseInt(conf.cvw / 3);
@@ -1412,7 +1494,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		seven2_3_2Wsquare: function(){
+		//seven2_3_2Wsquare
+		gs72: function(){
 			var simple = [];
 			var tripleH = Number.parseInt(conf.cvh / 3);
 			var middleW = Number.parseInt(conf.cvw / 2);
@@ -1432,25 +1515,27 @@ majo.creator = majo.creator || {};
 		}
 	};
 	var eightSquare={
-		eight2x4square: function () {
+		//eight2x4square
+		gs81: function () {
 			var simple = [];
 			var middleH = Number.parseInt(conf.cvh / 2);
 			var fourW = Number.parseInt(conf.cvw / 4);
 			//Ruler
 			simple.push(ruler(0, 0, fourW, middleH));
 			simple.push(ruler(fourW, 0, fourW, middleH));
-			simple.push(ruler(fourw * 2, 0, fourW, middleH));
+			simple.push(ruler(fourW * 2, 0, fourW, middleH));
 			simple.push(ruler(fourW * 3, 0, fourW, middleH));
 			simple.push(ruler(0, middleH, fourW, middleH));
 			simple.push(ruler(fourW, middleH, fourW, middleH));
-			simple.push(ruler(fourw * 2, middleH, fourW, middleH));
+			simple.push(ruler(fourW * 2, middleH, fourW, middleH));
 			simple.push(ruler(fourW * 3, middleH, fourW, middleH));
 			i = 0;
 			for (; i < simple.length; i++) {
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		eight4x2square: function(){
+		//eight4x2square
+		gs82: function(){
 			var simple = [];
 			var fourH = Number.parseInt(conf.cvh / 4);
 			var middleW = Number.parseInt(conf.cvw / 2);
@@ -1470,7 +1555,8 @@ majo.creator = majo.creator || {};
 		}
 	};
 	var nineSquare={
-		nine3x3square: function () {
+		//nine3x3square
+		gs91: function () {
 			var simple = [];
 			var tripleH = Number.parseInt(conf.cvh / 3);
 			var tripleW = Number.parseInt(conf.cvw / 3);
@@ -1489,7 +1575,8 @@ majo.creator = majo.creator || {};
 				imagenSorce[i].setUp(simple[i]);
 			}
 		},
-		nine4_5Wsquare: function(){
+		//nine4_5Wsquare
+		gs92: function(){
 			var simple = [];
 			var middleH = Number.parseInt(conf.cvh / 2);
 			var fourW = Number.parseInt(conf.cvh / 4);
@@ -1510,7 +1597,8 @@ majo.creator = majo.creator || {};
 			}
 		}
 	};
-	//Event for interact with user
+	
+	//Event for interact with user*/
 	//Searcher of image
 	this.setCurrentimage = function(x,y){
 		var len = imagenSorce.length;
@@ -1728,15 +1816,19 @@ majo.creator = majo.creator || {};
 					if(evt.dataTransfer["items"]){
 						var datas = evt.dataTransfer.items;
 						for(var i=0; i< datas.length;i++){
-							
 							if(datas[i].type.match('^text/html')){
 								datas[i].getAsString(function(e){
 									var parser = new DOMParser();
 									var doc = parser.parseFromString(e, "text/html");
 									var img = doc.getElementsByTagName('img');
-									if(img.length > 0){
-										//before verify the image size 
-										console.log(img[0]);
+									if(img.length > 0){										
+										 var imgdata = {
+									 		id: self.getImageLength(),
+								        	src: img[0].src,
+								        	tmpsrc: img[0].src,
+								        	alt: "",
+								        };
+										self.newImagen(imgdata)
 									}
 								});
 							}

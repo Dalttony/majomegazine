@@ -8,7 +8,9 @@ var majo = majo || {};
 	var _self = this;
 
 	// variable for the differents styles of the canvas
-	var OptionsGrid = [{ id: 1, name: "Single", backgroundimg: "" }, { id: 2, name: "Sigle resplandor", backgroundimg: "" }, { id: 3, name: "double vertical", backgroundimg: "" }, { id: 4, name: "double horizontal", backgroundimg: "" }, { id: 5, name: "tripe vertical ", backgroundimg: "" }, { id: 6, name: "tripe Hirizontal", backgroundimg: "" }, { id: 7, name: "four grid", backgroundimg: "" }, { id: 8, name: "OtherOptions", backgroundimg: "" }];
+	var OptionsGrid = [{ id: "1-1", name: "Single", backgroundimg: "", cls: "on" }, { id: "1-2", name: "Sigle resplandor", backgroundimg: "", cls: "on" }, { id: "2-1", name: "double vertical", backgroundimg: "", cls: "tw" }, { id: "2-2", name: "double horizontal", backgroundimg: "", cls: "tw" }, { id: "3-1", name: "tripe vertical ", backgroundimg: "", cls: "tr" }, { id: "3-2", name: "tripe Hirizontal", backgroundimg: "", cls: "tr" }, { id: "4-1", name: "four grid", backgroundimg: "", cls: "fr" }, { id: "4-2", name: "four vertical", backgroundimg: "", cls: "fr" }, { id: "4-3", name: "four horizontal", backgroundimg: "", cls: "fr" }, { id: "5-1", name: "five grid", backgroundimg: "", cls: "fv" }, { id: "6-1", name: "six grid", backgroundimg: "", cls: "sx" }, { id: "7-1", name: "seven grid", backgroundimg: "", cls: "sv" }, { id: "8-1", name: "eight grid", backgroundimg: "", cls: "eig" }, { id: "9-1", name: "none grid", backgroundimg: "", cls: "no" }];
+
+	var imgType = {};
 
 	//Style Element for the imagen searched
 	var ImagenMeme = React.createClass({
@@ -27,7 +29,7 @@ var majo = majo || {};
 		}
 	});
 	//to create the imagen list that is using in the canvas
-	var Imagen = React.createClass({
+	var ImagenList = React.createClass({
 		onMouseEnter: function (evt) {},
 		onMouseLeave: function (evt) {},
 		onClick: function (evt) {
@@ -97,7 +99,9 @@ var majo = majo || {};
 			majo.observer.attach("Search", this.handleUserSearch);
 		},
 		getInitialState: function () {
-			return { sourceImage: [] };
+			return { sourceImage: [],
+				se_by: "Recent created",
+				tmp_sourceImage: [] };
 		},
 		handleUserSearch: function (data) {
 			this.setState({ sourceImage: data });
@@ -109,9 +113,14 @@ var majo = majo || {};
 			var self = this;
 			var valor = event.target.innerText;
 			if (valor.trim().length > 0) {
+				this.setState({ se_by: valor.trim() });
 				majo.observer.notify("Search", { strsearch: valor.trim() });
 			}
 			event.preventDefault();
+		},
+		searchStaticFiles: function (evt) {
+			this.setState({ se_by: evt.target.innerText });
+			majo.observer.notify("Search", { staticfile: evt.target.id.split('-')[1], strsearch: evt.target.innerText });
 		},
 		render: function () {
 			return React.createElement(
@@ -120,7 +129,7 @@ var majo = majo || {};
 				React.createElement(SearchElement, { onHandleSearch: this.handleUserSearch }),
 				React.createElement(
 					"div",
-					{ id: "searchBycategory" },
+					{ id: "din-mic", className: "srch" },
 					React.createElement(
 						"p",
 						null,
@@ -179,8 +188,32 @@ var majo = majo || {};
 				),
 				React.createElement(
 					"div",
-					null,
-					"Recentes imagenes"
+					{ id: "sta-ic", className: "srch" },
+					React.createElement(
+						"p",
+						null,
+						" Search "
+					),
+					React.createElement(
+						"span",
+						{ onClick: this.searchStaticFiles, id: "sta-1" },
+						"Sticker"
+					),
+					React.createElement(
+						"span",
+						{ onClick: this.searchStaticFiles, id: "sta-2" },
+						"Backgroud"
+					)
+				),
+				React.createElement(
+					"div",
+					{ className: "srch" },
+					React.createElement(
+						"p",
+						null,
+						" Image of ",
+						this.state.se_by
+					)
 				),
 				React.createElement(ContentImage, { srcDataImage: this.state.sourceImage, onImageNew: this.onImageNew }),
 				React.createElement("div", { id: "ContentImage" })
@@ -189,11 +222,15 @@ var majo = majo || {};
 	});
 	//options of the grid canvas
 	var StyleGrid = React.createClass({
+		changeStyleGrid: function (evt) {
+			var q_q = evt.target.id.split('-');
+			//set the style grid
+			majo.creator.setStyleGrid(q_q[0], q_q[1]);
+		},
 		render: function () {
-
 			return React.createElement(
 				"li",
-				null,
+				{ onClick: this.changeStyleGrid, id: this.props.gstyle.id, className: this.props.gstyle.cls },
 				this.props.gstyle.name
 			);
 		}
@@ -202,7 +239,9 @@ var majo = majo || {};
 	//Principal layout for to create the meme
 	var Creator = React.createClass({
 		getInitialState: function () {
-			return { imglist: [] };
+			return { imglist: [],
+				gridstyle: []
+			};
 		},
 		componentDidMount: function () {
 			majo.observer.attach("editimage");
@@ -211,20 +250,28 @@ var majo = majo || {};
 			majo.observer.attach("createdMeme", this.createdsucces);
 			majo.observer.attach("newImagen", this.addImage);
 			majo.observer.attach("removeImagen", this.removeImagen);
+			this.setState({
+				gridstyle: this.props.gridstyle
+			});
 			//MajoCreator.initialize("canvas");
 		},
 		addImage: function (data) {
-			var newdata = this.state.imglist.concat(data);
-			this.setState({
-				imglist: newdata
-			});
+			if (data.length) {
+				var newdata = this.state.imglist.concat(data);
+				this.setState({
+					imglist: newdata
+				});
+				this.onablestyle(newdata.length);
+			} else {}
 		},
 		removeImagen: function (id) {
 			var newdata = this.state.imglist;
 			newdata.splice(id, 1);
+
 			this.setState({
 				imglist: newdata
 			});
+			this.onablestyle(newdata.length);
 		},
 		addNewTextMeme: function (evt) {
 			var d = majo.observer.notify("newText", 1);
@@ -253,11 +300,26 @@ var majo = majo || {};
 			//this.nt = evt.target.id.split('-')[2]; //nt flag to know when the user select the social network to share
 			//majo.observer.notify("createdMeme");
 		},
+		onablestyle: function (cls) {
+			if (cls != 0) {
+				var newstyles = this.props.gridstyle.filter(function (obj) {
+					var q = parseInt(obj.id.split('-')[0]);
+					return q === cls;
+				});
+				this.setState({
+					gridstyle: newstyles
+				});
+			} else {
+				this.setState({
+					gridstyle: this.props.gridstyle
+				});
+			}
+		},
 		editimage: function (argument) {
 			majo.observer.notify("editimage");
 		},
 		render: function () {
-			var gridstyle = this.props.gridstyle;
+			var gridstyle = this.state.gridstyle;
 			var rowstyle = [];
 			var data = this.state.imglist;
 			var self = this;
@@ -362,7 +424,7 @@ var majo = majo || {};
 							"div",
 							{ id: "imagelist" },
 							data.map(function (result) {
-								return React.createElement(Imagen, { key: result.id, data: result });
+								return React.createElement(ImagenList, { key: result.id, data: result });
 							})
 						),
 						React.createElement(
@@ -374,10 +436,15 @@ var majo = majo || {};
 							"div",
 							{ id: "layout" },
 							React.createElement(
+								"span",
+								null,
+								"Frames"
+							),
+							React.createElement(
 								"ul",
 								null,
-								gridstyle.map(function (style) {
-									return React.createElement(StyleGrid, { key: style.id, gstyle: style });
+								this.state.gridstyle.map(function (style) {
+									return React.createElement(StyleGrid, { onable: self.onablestyle, key: style.id, gstyle: style });
 								})
 							)
 						),

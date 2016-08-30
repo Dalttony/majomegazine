@@ -4,6 +4,9 @@ var majo = majo || {};
 (function(){
 	var images = Backbone.Model.extend({
 		url: function(){
+			if(this.typeData){
+				this.strseacrch = this.strseacrch+"/"+this.typeData;
+			}
 			return "index.php/majo/getImage/"+this.strseacrch;
 		},
 		defaults: {
@@ -37,16 +40,28 @@ var majo = majo || {};
 			Backbone.Model.apply(this, arguments);
 		},		
 
-  		getDataImage:function (strsearch, notify){
-  			this.dataImage.strseacrch = strsearch;
+  		getDataImage:function (data, notify){
+  			this.dataImage.typeData = (data.staticfile) ? data.staticfile : 0;
+  			this.dataImage.strseacrch = data.strsearch;
   			var self = this;
   			this.dataImage.fetch({
   				success:function(response,data){
-  					self.notify(notify,data)
+  					self.notify(notify, data)
   				}
   			});
   		},
+  		getDataStaticImage:function(data, notify){
 
+  			this.dataImage.strseacrch = data.name;
+  			this.dataImage.typeData = parseInt(data.staticfile);
+  			var self = this;
+  			this.dataImage.fetch({
+  				success:function(response, data){
+				console.log(response);
+  					self.notify(notify, data)
+  				}
+  			});
+  		},
   		notify:function(notify,data){
   			majo.observer.receiveNotify(notify,data)
   		},
